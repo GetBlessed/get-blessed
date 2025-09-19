@@ -256,8 +256,8 @@ const Index = () => {
             onClick={() => setCurrentView("home")}
             className="flex items-center gap-2 px-4 py-2 rounded-xl font-medium"
           >
-            <Home className="h-4 w-4" />
-            Home
+            <Users className="h-4 w-4" />
+            Community
           </Button>
           <Button
             variant={currentView === "my-prayers" ? "default" : "ghost"}
@@ -271,15 +271,6 @@ const Index = () => {
           >
             <Heart className="h-4 w-4" />
             My Prayers
-          </Button>
-          <Button
-            variant={currentView === "community" ? "default" : "ghost"}
-            size="sm"
-            onClick={() => setCurrentView("community")}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl font-medium"
-          >
-            <Users className="h-4 w-4" />
-            Community
           </Button>
           <Button
             variant={currentView === "gifts" ? "default" : "ghost"}
@@ -302,7 +293,30 @@ const Index = () => {
   if (currentView === "gifts") {
     return (
       <div className="min-h-screen bg-background">
+        {/* Navigation Header */}
+        <nav className="bg-background border-b border-border/50 px-4 py-3">
+          <div className="max-w-4xl mx-auto flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <h1 className="text-xl font-bold text-primary">GetBlessed</h1>
+              <span className="text-xs text-muted-foreground">• Connecting hearts through prayer</span>
+            </div>
+            {user ? (
+              <Button variant="outline" size="sm" className="flex items-center gap-2" onClick={handleLogout}>
+                <User className="h-4 w-4" />
+                {user.name} • Sign Out
+              </Button>
+            ) : (
+              <Button variant="outline" size="sm" className="flex items-center gap-2" onClick={() => setShowAuthModal(true)}>
+                <User className="h-4 w-4" />
+                Sign In
+              </Button>
+            )}
+          </div>
+        </nav>
+
+        {/* Main Navigation */}
         {renderMainNavigation()}
+
         <div className="bg-gradient-primary text-primary-foreground px-6 py-8">
           <div className="max-w-4xl mx-auto">
             <h1 className="text-3xl font-serif font-semibold mb-4">Spiritual Gifts</h1>
@@ -315,103 +329,6 @@ const Index = () => {
             <h2 className="text-xl font-serif font-semibold mb-2">Coming Soon</h2>
             <p className="text-muted-foreground">The gifts feature will be available soon!</p>
           </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (currentView === "community") {
-    return (
-      <div className="min-h-screen bg-background">
-        {renderMainNavigation()}
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          <h1 className="text-3xl font-serif font-semibold text-center mb-8">Community Feed</h1>
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <div className="text-center mb-6">
-              <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 bg-muted/50 rounded-2xl p-1">
-                <TabsTrigger value="prayers" className="text-sm font-medium rounded-xl">
-                  Submitted Prayers
-                </TabsTrigger>
-                <TabsTrigger value="blessings" className="text-sm font-medium rounded-xl">
-                  Blessing Requests
-                </TabsTrigger>
-              </TabsList>
-            </div>
-
-            <TabsContent value="prayers" className="space-y-6">
-              <div className="flex justify-center mb-6">
-                <div className="inline-flex rounded-2xl border border-border/50 p-1.5 bg-muted/30">
-                  <Button
-                    variant={activeFilter === "all" ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => setActiveFilter("all")}
-                    className="text-sm rounded-xl"
-                  >
-                    All Submitted
-                  </Button>
-                  <Button
-                    variant={activeFilter === "individual" ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => setActiveFilter("individual")}
-                    className="text-sm rounded-xl"
-                  >
-                    Individual
-                  </Button>
-                  <Button
-                    variant={activeFilter === "organization" ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => setActiveFilter("organization")}
-                    className="text-sm rounded-xl"
-                  >
-                    Groups & Organizations
-                  </Button>
-                </div>
-              </div>
-
-              <div className="space-y-6">
-                {filteredPrayers.map((prayer) => (
-                  <PrayerCard key={prayer.id} {...prayer} />
-                ))}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="blessings" className="space-y-6">
-              <div className="flex justify-center mb-6">
-                <div className="inline-flex rounded-2xl border border-border/50 p-1.5 bg-muted/30">
-                  <Button
-                    variant={activeFilter === "all" ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => setActiveFilter("all")}
-                    className="text-sm rounded-xl"
-                  >
-                    All Requests
-                  </Button>
-                  <Button
-                    variant={activeFilter === "individual" ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => setActiveFilter("individual")}
-                    className="text-sm rounded-xl"
-                  >
-                    Individual
-                  </Button>
-                  <Button
-                    variant={activeFilter === "organization" ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => setActiveFilter("organization")}
-                    className="text-sm rounded-xl"
-                  >
-                    Groups & Organizations
-                  </Button>
-                </div>
-              </div>
-
-              <div className="space-y-6">
-                {filteredPrayers.map((prayer) => (
-                  <PrayerCard key={prayer.id} {...prayer} />
-                ))}
-              </div>
-            </TabsContent>
-          </Tabs>
         </div>
       </div>
     );

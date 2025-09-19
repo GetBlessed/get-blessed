@@ -235,25 +235,28 @@ export const PrayerSubmission = ({ onSubmit }: PrayerSubmissionProps) => {
             <div className="text-right text-primary-foreground/60 text-sm">
               {content.length}/500
             </div>
-            {content.length > 10 && !showScripture && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => generateScriptureSuggestion(content)}
-                disabled={isLoadingScripture}
-                className="text-primary-foreground/80 hover:text-primary-foreground"
-              >
-                {isLoadingScripture ? (
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary-foreground border-t-transparent"></div>
-                ) : (
-                  <>
-                    <Sparkles className="h-4 w-4 mr-2" />
-                    Get Scripture
-                  </>
-                )}
-              </Button>
-            )}
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => content.length > 10 ? generateScriptureSuggestion(content) : null}
+              disabled={isLoadingScripture || content.length <= 10}
+              className={`transition-all ${
+                content.length <= 10 
+                  ? 'text-primary-foreground/40 cursor-not-allowed' 
+                  : 'text-primary-foreground/80 hover:text-primary-foreground'
+              }`}
+              title={content.length <= 10 ? "Write at least 10 characters to get scripture suggestions" : "Get scripture suggestion"}
+            >
+              {isLoadingScripture ? (
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary-foreground border-t-transparent"></div>
+              ) : (
+                <>
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Get Scripture
+                </>
+              )}
+            </Button>
           </div>
 
           {/* Scripture Suggestion */}
