@@ -217,26 +217,28 @@ export const PrayerCard = ({
               }`}
             >
               <Heart className={`h-4 w-4 transition-all ${hasSupported ? 'fill-current animate-heart-beat' : ''}`} />
-              <span className="text-xs font-medium">I'm with you!</span>
+              <span className="text-xs font-medium">
+                {type === "prayer" ? "Here with you" : "Holding you in prayer"}
+              </span>
               <span className="text-xs font-semibold">{supportCount}</span>
             </Button>
             
-            {type === "prayer" && (
-              <Button
-                variant="ghost"
-                size="sm" 
-                onClick={handlePraying}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-300 ${
-                  hasPrayed 
-                    ? 'text-blue-600 bg-blue-50 animate-bounce-gentle shadow-sm' 
-                    : 'hover:text-blue-600 hover:bg-blue-50 hover:shadow-sm'
-                }`}
-              >
-                <Users className={`h-4 w-4 ${hasPrayed ? 'fill-current' : ''}`} />
-                <span className="text-xs font-medium">Praying for you</span>
-                <span className="text-xs font-semibold">{prayingCount}</span>
-              </Button>
-            )}
+            <Button
+              variant="ghost"
+              size="sm" 
+              onClick={handlePraying}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-300 ${
+                hasPrayed 
+                  ? 'text-blue-600 bg-blue-50 animate-bounce-gentle shadow-sm' 
+                  : 'hover:text-blue-600 hover:bg-blue-50 hover:shadow-sm'
+              }`}
+            >
+              <Users className={`h-4 w-4 ${hasPrayed ? 'fill-current' : ''}`} />
+              <span className="text-xs font-medium">
+                {type === "prayer" ? "Praying with you" : "Cheering you on"}
+              </span>
+              <span className="text-xs font-semibold">{prayingCount}</span>
+            </Button>
             
             <Button
               variant="ghost"
@@ -249,7 +251,9 @@ export const PrayerCard = ({
               }`}
             >
               <Send className={`h-4 w-4 ${hasSentLove ? 'fill-current' : ''}`} />
-              <span className="text-xs font-medium">Sending love</span>
+              <span className="text-xs font-medium">
+                {type === "prayer" ? "Sending love" : "Sending strength"}
+              </span>
               <span className="text-xs font-semibold">{loveCount}</span>
             </Button>
           </div>
