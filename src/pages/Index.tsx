@@ -412,10 +412,6 @@ const Index = () => {
         {/* Community Feed with Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-foreground mb-4">
-              See how our community lifts each other up through submitted prayers and blessing requests
-            </h2>
-            
             <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 bg-muted">
               <TabsTrigger value="prayers" className="text-sm font-medium">
                 Submitted Prayers
