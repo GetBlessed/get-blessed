@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { PrayerCard } from "@/components/PrayerCard";
 import { PrayerSubmission } from "@/components/PrayerSubmission";
+import { AuthModal } from "@/components/AuthModal";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Heart, Users, User, Home, Gift } from "lucide-react";
@@ -162,6 +163,8 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState("prayers");
   const [activeFilter, setActiveFilter] = useState("all");
   const [currentView, setCurrentView] = useState("home");
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [user, setUser] = useState<{ name: string; email: string } | null>(null);
   const [stats] = useState({
     totalPrayers: 1247,
     totalBlessings: 892,
@@ -208,6 +211,23 @@ const Index = () => {
     return typeFilter && organizationFilter;
   });
 
+  const handleLogin = (userData: { name: string; email: string }) => {
+    setUser(userData);
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    setCurrentView("home");
+  };
+
+  const requireAuth = () => {
+    if (!user) {
+      setShowAuthModal(true);
+      return false;
+    }
+    return true;
+  };
+
   const renderMainNavigation = () => (
     <div className="bg-card border-b border-border/30 px-4 py-2">
       <div className="max-w-6xl mx-auto flex items-center justify-center">
@@ -224,7 +244,11 @@ const Index = () => {
           <Button
             variant={currentView === "my-prayers" ? "default" : "ghost"}
             size="sm"
-            onClick={() => setCurrentView("my-prayers")}
+            onClick={() => {
+              if (requireAuth()) {
+                setCurrentView("my-prayers");
+              }
+            }}
             className="flex items-center gap-2 px-4 py-2 rounded-xl font-medium"
           >
             <Heart className="h-4 w-4" />
@@ -253,7 +277,7 @@ const Index = () => {
     </div>
   );
 
-  if (currentView === "my-prayers") {
+  if (currentView === "my-prayers" && user) {
     return <Dashboard />;
   }
 
@@ -384,10 +408,17 @@ const Index = () => {
             <h1 className="text-xl font-bold text-primary">GetBlessed</h1>
             <span className="text-xs text-muted-foreground">• Connecting hearts through prayer</span>
           </div>
-          <Button variant="outline" size="sm" className="flex items-center gap-2" onClick={() => setCurrentView("my-prayers")}>
-            <User className="h-4 w-4" />
-            Create Profile
-          </Button>
+          {user ? (
+            <Button variant="outline" size="sm" className="flex items-center gap-2" onClick={handleLogout}>
+              <User className="h-4 w-4" />
+              {user.name} • Sign Out
+            </Button>
+          ) : (
+            <Button variant="outline" size="sm" className="flex items-center gap-2" onClick={() => setShowAuthModal(true)}>
+              <User className="h-4 w-4" />
+              Sign In
+            </Button>
+          )}
         </div>
       </nav>
 
@@ -426,18 +457,29 @@ const Index = () => {
       <main className="max-w-4xl mx-auto px-4 py-8">
         {/* Share Button */}
         <div className="text-center mb-8">
-          <Button
-            onClick={() => setShowSubmission(!showSubmission)}
-            size="lg"
-            className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-8 py-3 shadow-medium transition-all hover:shadow-elevated"
-          >
-            <Plus className="h-5 w-5 mr-2" />
-            {showSubmission ? "Close" : "Share Your Heart"}
-          </Button>
+          {user ? (
+            <Button
+              onClick={() => setShowSubmission(!showSubmission)}
+              size="lg"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-8 py-3 shadow-medium transition-all hover:shadow-elevated"
+            >
+              <Plus className="h-5 w-5 mr-2" />
+              {showSubmission ? "Close" : "Share Your Heart"}
+            </Button>
+          ) : (
+            <Button
+              onClick={() => setShowAuthModal(true)}
+              size="lg"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-8 py-3 shadow-medium transition-all hover:shadow-elevated"
+            >
+              <Plus className="h-5 w-5 mr-2" />
+              Sign In to Share
+            </Button>
+          )}
         </div>
 
         {/* Prayer Submission Form */}
-        {showSubmission && (
+        {showSubmission && user && (
           <div className="mb-8">
             <PrayerSubmission onSubmit={handleNewPrayer} />
           </div>
@@ -584,6 +626,13 @@ const Index = () => {
           </p>
         </div>
       </footer>
+
+      {/* Auth Modal */}
+      <AuthModal 
+        isOpen={showAuthModal} 
+        onClose={() => setShowAuthModal(false)}
+        onLogin={handleLogin}
+      />
     </div>
   );
 };
