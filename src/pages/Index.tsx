@@ -192,7 +192,7 @@ const Index = () => {
           </h1>
           <p className="text-xl opacity-90 max-w-2xl mx-auto leading-relaxed">
             A community where hearts connect through prayer and blessing. 
-            Share your burdens, celebrate your joys, and find strength together.
+            Submit prayers to lift others up, ask for blessings when you need support.
           </p>
           
           {/* Stats */}
@@ -237,15 +237,15 @@ const Index = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="text-center mb-6">
             <h2 className="text-2xl font-bold text-foreground mb-4">
-              See how our community supports each other through prayers and celebrates answered blessings
+              See how our community lifts each other up through submitted prayers and blessing requests
             </h2>
             
             <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 bg-muted">
               <TabsTrigger value="prayers" className="text-sm font-medium">
-                Community Prayers
+                Submitted Prayers
               </TabsTrigger>
               <TabsTrigger value="blessings" className="text-sm font-medium">
-                Gratitude & Thanks
+                Blessing Requests
               </TabsTrigger>
             </TabsList>
           </div>
@@ -260,7 +260,7 @@ const Index = () => {
                   onClick={() => setActiveFilter("all")}
                   className="text-sm"
                 >
-                  All Prayers
+                  All Submitted
                 </Button>
                 <Button
                   variant={activeFilter === "individual" ? "default" : "ghost"}
@@ -301,7 +301,7 @@ const Index = () => {
                   onClick={() => setActiveFilter("all")}
                   className="text-sm"
                 >
-                  All Blessings
+                  All Requests
                 </Button>
                 <Button
                   variant={activeFilter === "individual" ? "default" : "ghost"}

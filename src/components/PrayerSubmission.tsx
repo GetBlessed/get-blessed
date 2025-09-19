@@ -72,7 +72,7 @@ export const PrayerSubmission = ({ onSubmit }: PrayerSubmissionProps) => {
       setOrganizationType("individual");
       
       toast({
-        title: type === "prayer" ? "Prayer shared! 🙏" : "Blessing sent! ✨",
+        title: type === "prayer" ? "Prayer submitted! 🙏" : "Blessing request shared! ✨",
         description: "Your heartfelt message has been shared with the community.",
       });
     } catch (error) {
@@ -94,7 +94,7 @@ export const PrayerSubmission = ({ onSubmit }: PrayerSubmissionProps) => {
             Share Your Heart
           </h2>
           <p className="text-primary-foreground/80">
-            Request prayers or offer blessings to the community
+            Submit prayers or ask for blessings from the community
           </p>
         </div>
 
@@ -108,8 +108,8 @@ export const PrayerSubmission = ({ onSubmit }: PrayerSubmissionProps) => {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="prayer">Request a prayer</SelectItem>
-              <SelectItem value="blessing">Share a blessing</SelectItem>
+              <SelectItem value="prayer">Submit a prayer</SelectItem>
+              <SelectItem value="blessing">Ask for a blessing</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -145,8 +145,8 @@ export const PrayerSubmission = ({ onSubmit }: PrayerSubmissionProps) => {
             onChange={(e) => setContent(e.target.value)}
             placeholder={
               type === "prayer" 
-                ? "Share what's on your heart. The community is here to support you..."
-                : "Share your blessing or words of encouragement..."
+                ? "Share your prayer with the community. Your words can bring comfort and hope to others..."
+                : "What blessing are you seeking? Share what's on your heart..."
             }
             className="min-h-[120px] bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/60 resize-none"
             maxLength={500}
@@ -240,7 +240,7 @@ export const PrayerSubmission = ({ onSubmit }: PrayerSubmissionProps) => {
           ) : (
             <div className="flex items-center gap-2">
               {type === "prayer" ? <Heart className="h-5 w-5" /> : <Send className="h-5 w-5" />}
-              {type === "prayer" ? "Share Prayer" : "Send Blessing"}
+              {type === "prayer" ? "Submit Prayer" : "Ask for Blessing"}
             </div>
           )}
         </Button>
