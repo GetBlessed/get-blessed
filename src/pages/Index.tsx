@@ -295,11 +295,12 @@ const Index = () => {
       <div className="min-h-screen bg-background">
         {/* Navigation Header */}
         <nav className="bg-background border-b border-border/50 px-4 py-3">
-          <div className="max-w-4xl mx-auto flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <h1 className="text-xl font-bold text-primary">GetBlessed</h1>
-              <span className="text-xs text-muted-foreground">• Connecting hearts through prayer</span>
-            </div>
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <img src="/src/assets/logo.png" alt="GetBlessed" className="h-8 w-8" />
+            <h1 className="text-xl font-bold text-primary">GetBlessed</h1>
+            <span className="text-xs text-muted-foreground">• Connecting hearts through prayer</span>
+          </div>
             {user ? (
               <Button variant="outline" size="sm" className="flex items-center gap-2" onClick={handleLogout}>
                 <User className="h-4 w-4" />
@@ -338,11 +339,12 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       {/* Navigation Header */}
       <nav className="bg-background border-b border-border/50 px-4 py-3">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-primary">GetBlessed</h1>
-            <span className="text-xs text-muted-foreground">• Connecting hearts through prayer</span>
-          </div>
+          <div className="max-w-4xl mx-auto flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <img src="/src/assets/logo.png" alt="GetBlessed" className="h-8 w-8" />
+              <h1 className="text-xl font-bold text-primary">GetBlessed</h1>
+              <span className="text-xs text-muted-foreground">• Connecting hearts through prayer</span>
+            </div>
           {user ? (
             <Button variant="outline" size="sm" className="flex items-center gap-2" onClick={handleLogout}>
               <User className="h-4 w-4" />
@@ -363,6 +365,9 @@ const Index = () => {
       {/* Hero Header */}
       <header className="bg-gradient-hero text-primary-foreground py-12 px-4">
         <div className="max-w-4xl mx-auto text-center space-y-6">
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <img src="/src/assets/logo.png" alt="GetBlessed" className="h-16 w-16" />
+          </div>
           <h1 className="text-5xl font-serif font-semibold tracking-tight">
             Welcome to GetBlessed
           </h1>
@@ -374,15 +379,24 @@ const Index = () => {
           {/* Stats */}
           <div className="flex justify-center gap-8 pt-6">
             <div className="text-center">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">🙏</span>
               <div className="text-2xl font-bold">{stats.totalPrayers.toLocaleString()}</div>
+            </div>
               <div className="text-sm opacity-80">Prayers Shared</div>
             </div>
             <div className="text-center">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">✨</span>
               <div className="text-2xl font-bold">{stats.totalBlessings.toLocaleString()}</div>
+            </div>
               <div className="text-sm opacity-80">Blessings Given</div>
             </div>
             <div className="text-center">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">🌟</span>
               <div className="text-2xl font-bold">{stats.activeCommunity.toLocaleString()}</div>
+            </div>
               <div className="text-sm opacity-80">Community Members</div>
             </div>
           </div>
