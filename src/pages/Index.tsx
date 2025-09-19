@@ -2,6 +2,7 @@ import { useState } from "react";
 import { PrayerCard } from "@/components/PrayerCard";
 import { PrayerSubmission } from "@/components/PrayerSubmission";
 import AuthModal from "@/components/AuthModal";
+import PostSubmissionAuthModal from "@/components/PostSubmissionAuthModal";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Heart, Users, User, Home, Gift } from "lucide-react";
@@ -164,6 +165,7 @@ const Index = () => {
   const [activeFilter, setActiveFilter] = useState("all");
   const [currentView, setCurrentView] = useState("home");
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showPostSubmissionAuth, setShowPostSubmissionAuth] = useState(false);
   const [user, setUser] = useState<{ name: string; email: string } | null>(null);
   const [stats] = useState({
     totalPrayers: 1247,
@@ -195,6 +197,11 @@ const Index = () => {
     setPrayers(prev => [prayer, ...prev]);
     setShowSubmission(false);
 
+    // Show auth prompt after submission if user isn't logged in
+    if (!user) {
+      setShowPostSubmissionAuth(true);
+    }
+
     // Handle forwarding if email or phone provided
     if (newPrayer.forwardEmail || newPrayer.forwardPhone) {
       // In real implementation, this would send the prayer via email/SMS
@@ -213,11 +220,22 @@ const Index = () => {
 
   const handleLogin = (userData: { name: string; email: string }) => {
     setUser(userData);
+    setShowPostSubmissionAuth(false);
   };
 
   const handleLogout = () => {
     setUser(null);
     setCurrentView("home");
+  };
+
+  const handlePostSubmissionSignUp = () => {
+    setShowPostSubmissionAuth(false);
+    setShowAuthModal(true);
+  };
+
+  const handlePostSubmissionSignIn = () => {
+    setShowPostSubmissionAuth(false);
+    setShowAuthModal(true);
   };
 
   const requireAuth = () => {
@@ -457,29 +475,18 @@ const Index = () => {
       <main className="max-w-4xl mx-auto px-4 py-8">
         {/* Share Button */}
         <div className="text-center mb-8">
-          {user ? (
-            <Button
-              onClick={() => setShowSubmission(!showSubmission)}
-              size="lg"
-              className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-8 py-3 shadow-medium transition-all hover:shadow-elevated"
-            >
-              <Plus className="h-5 w-5 mr-2" />
-              {showSubmission ? "Close" : "Share Your Heart"}
-            </Button>
-          ) : (
-            <Button
-              onClick={() => setShowAuthModal(true)}
-              size="lg"
-              className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-8 py-3 shadow-medium transition-all hover:shadow-elevated"
-            >
-              <Plus className="h-5 w-5 mr-2" />
-              Sign In to Share
-            </Button>
-          )}
+          <Button
+            onClick={() => setShowSubmission(!showSubmission)}
+            size="lg"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-8 py-3 shadow-medium transition-all hover:shadow-elevated"
+          >
+            <Plus className="h-5 w-5 mr-2" />
+            {showSubmission ? "Close" : "Share Your Heart"}
+          </Button>
         </div>
 
         {/* Prayer Submission Form */}
-        {showSubmission && user && (
+        {showSubmission && (
           <div className="mb-8">
             <PrayerSubmission onSubmit={handleNewPrayer} />
           </div>
@@ -632,6 +639,14 @@ const Index = () => {
         isOpen={showAuthModal} 
         onClose={() => setShowAuthModal(false)}
         onLogin={handleLogin}
+      />
+
+      {/* Post-Submission Auth Modal */}
+      <PostSubmissionAuthModal
+        isOpen={showPostSubmissionAuth}
+        onClose={() => setShowPostSubmissionAuth(false)}
+        onSignUp={handlePostSubmissionSignUp}
+        onSignIn={handlePostSubmissionSignIn}
       />
     </div>
   );

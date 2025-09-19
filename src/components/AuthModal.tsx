@@ -37,7 +37,7 @@ export const AuthModal = ({ isOpen, onClose, onLogin }: AuthModalProps) => {
     // Simulate login
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    onLogin({ name: "Nicole Davis", email: loginEmail });
+    onLogin({ name: "Favio Osorio", email: loginEmail });
     toast({
       title: "Welcome back! 🙏",
       description: "You've successfully signed in to GetBlessed.",
