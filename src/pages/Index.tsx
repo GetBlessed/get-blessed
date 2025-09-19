@@ -374,15 +374,15 @@ const Index = () => {
           {/* Stats */}
           <div className="flex justify-center gap-8 pt-6">
             <div className="text-center">
-              <div className="text-2xl font-bold">{stats.totalPrayers.toLocaleString()}</div>
+              <div className="text-2xl font-bold">🙏 {stats.totalPrayers.toLocaleString()}</div>
               <div className="text-sm opacity-80">Prayers Shared</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold">{stats.totalBlessings.toLocaleString()}</div>
+              <div className="text-2xl font-bold">✨ {stats.totalBlessings.toLocaleString()}</div>
               <div className="text-sm opacity-80">Blessings Given</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold">{stats.activeCommunity.toLocaleString()}</div>
+              <div className="text-2xl font-bold">🤝 {stats.activeCommunity.toLocaleString()}</div>
               <div className="text-sm opacity-80">Community Members</div>
             </div>
           </div>
