@@ -166,10 +166,10 @@ export const PrayerSubmission = ({ onSubmit }: PrayerSubmissionProps) => {
   };
 
   return (
-    <Card className="p-6 bg-gradient-hero shadow-elevated border-primary/20">
+    <Card className="p-8 bg-gradient-hero shadow-elevated border-primary/30 rounded-2xl">
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="text-center space-y-2">
-          <h2 className="text-2xl font-bold text-primary-foreground">
+          <h2 className="text-3xl font-serif font-semibold text-primary-foreground">
             Share Your Heart
           </h2>
           <p className="text-primary-foreground/80">
@@ -313,12 +313,12 @@ export const PrayerSubmission = ({ onSubmit }: PrayerSubmissionProps) => {
               className="hidden"
               id="image-upload"
             />
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => document.getElementById('image-upload')?.click()}
-              className="w-full bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/20"
-            >
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => document.getElementById('image-upload')?.click()}
+            className="w-full bg-primary-foreground/10 border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/20 rounded-xl py-3 transition-all"
+          >
               <ImageIcon className="h-4 w-4 mr-2" />
               Choose Image
             </Button>
@@ -328,7 +328,7 @@ export const PrayerSubmission = ({ onSubmit }: PrayerSubmissionProps) => {
                 <img 
                   src={uploadedImage} 
                   alt="Uploaded" 
-                  className="w-full max-h-48 object-cover rounded-lg border border-primary-foreground/20"
+                  className="w-full max-h-48 object-cover rounded-xl border border-primary-foreground/30"
                 />
                 <Button
                   type="button"
@@ -466,7 +466,7 @@ export const PrayerSubmission = ({ onSubmit }: PrayerSubmissionProps) => {
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-primary-foreground text-primary hover:bg-primary-foreground/90 font-medium py-3 transition-colors"
+          className="w-full bg-primary-foreground text-primary hover:bg-primary-foreground/90 font-medium py-4 rounded-xl transition-all shadow-sm hover:shadow-medium"
         >
           {isSubmitting ? (
             <div className="flex items-center gap-2">

@@ -42,6 +42,10 @@ export const PrayerCard = ({
   const [showComments, setShowComments] = useState(false);
   const [showGiftOptions, setShowGiftOptions] = useState(false);
   const [newComment, setNewComment] = useState("");
+  const [comments, setComments] = useState([
+    { id: 1, author: "Sarah M.", text: "Sending prayers your way 🙏", timeAgo: "5m ago" },
+    { id: 2, author: "Michael K.", text: "You're in my thoughts", timeAgo: "12m ago" }
+  ]);
   const { toast } = useToast();
 
   const handleSupport = () => {
@@ -98,11 +102,20 @@ export const PrayerCard = ({
     e.preventDefault();
     if (!newComment.trim()) return;
     
+    const comment = {
+      id: Date.now(),
+      author: "You",
+      text: newComment.trim(),
+      timeAgo: "Just now"
+    };
+    
+    setComments(prev => [comment, ...prev]);
+    setNewComment("");
+    
     toast({
       title: "Comment added! 💬",
       description: "Your comment has been shared.",
     });
-    setNewComment("");
   };
 
   const handleCommentKeyPress = (e: React.KeyboardEvent) => {
@@ -117,10 +130,10 @@ export const PrayerCard = ({
   };
 
   return (
-    <Card className={`p-6 transition-all duration-300 hover:shadow-medium ${
+    <Card className={`p-6 transition-all duration-300 hover:shadow-medium rounded-2xl ${
       type === 'prayer' 
-        ? 'bg-gradient-prayer border-prayer/20' 
-        : 'bg-gradient-blessing border-blessing/20'
+        ? 'bg-gradient-prayer border-prayer/30' 
+        : 'bg-gradient-blessing border-blessing/30'
     }`}>
       <div className="space-y-4">
         {/* Header with Category Badge and Urgent Indicator */}
@@ -132,11 +145,11 @@ export const PrayerCard = ({
               </div>
             )}
             {organizationType === "organization" ? (
-              <div className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+              <div className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
                 Organization
               </div>
             ) : (
-              <div className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+              <div className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
                 Individual
               </div>
             )}
@@ -191,21 +204,21 @@ export const PrayerCard = ({
         </div>
         
         {/* Enhanced Support Actions */}
-        <div className="space-y-3 pt-2 border-t border-border/50">
-          <div className="flex items-center justify-between gap-2">
+        <div className="space-y-4 pt-4 border-t border-border/30">
+          <div className="flex items-center justify-between gap-3">
             <Button
               variant="ghost"
               size="sm"
               onClick={handleSupport}
-              className={`flex items-center gap-2 transition-all duration-300 ${
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-300 ${
                 hasSupported 
-                  ? 'text-primary bg-primary/10 animate-celebrate' 
-                  : 'hover:text-primary hover:bg-primary/5'
+                  ? 'text-primary bg-primary/10 animate-celebrate shadow-sm' 
+                  : 'hover:text-primary hover:bg-primary/5 hover:shadow-sm'
               }`}
             >
               <Heart className={`h-4 w-4 transition-all ${hasSupported ? 'fill-current animate-heart-beat' : ''}`} />
               <span className="text-xs font-medium">I'm with you!</span>
-              <span className="text-xs">{supportCount}</span>
+              <span className="text-xs font-semibold">{supportCount}</span>
             </Button>
             
             {type === "prayer" && (
@@ -213,15 +226,15 @@ export const PrayerCard = ({
                 variant="ghost"
                 size="sm" 
                 onClick={handlePraying}
-                className={`flex items-center gap-2 transition-all duration-300 ${
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-300 ${
                   hasPrayed 
-                    ? 'text-blue-600 bg-blue-50 animate-bounce-gentle' 
-                    : 'hover:text-blue-600 hover:bg-blue-50'
+                    ? 'text-blue-600 bg-blue-50 animate-bounce-gentle shadow-sm' 
+                    : 'hover:text-blue-600 hover:bg-blue-50 hover:shadow-sm'
                 }`}
               >
                 <Users className={`h-4 w-4 ${hasPrayed ? 'fill-current' : ''}`} />
                 <span className="text-xs font-medium">Praying for you</span>
-                <span className="text-xs">{prayingCount}</span>
+                <span className="text-xs font-semibold">{prayingCount}</span>
               </Button>
             )}
             
@@ -229,25 +242,25 @@ export const PrayerCard = ({
               variant="ghost"
               size="sm"
               onClick={handleSendLove}
-              className={`flex items-center gap-2 transition-all duration-300 ${
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-300 ${
                 hasSentLove 
-                  ? 'text-pink-600 bg-pink-50 animate-pulse-love' 
-                  : 'hover:text-pink-600 hover:bg-pink-50'
+                  ? 'text-pink-600 bg-pink-50 animate-pulse-love shadow-sm' 
+                  : 'hover:text-pink-600 hover:bg-pink-50 hover:shadow-sm'
               }`}
             >
               <Send className={`h-4 w-4 ${hasSentLove ? 'fill-current' : ''}`} />
               <span className="text-xs font-medium">Sending love</span>
-              <span className="text-xs">{loveCount}</span>
+              <span className="text-xs font-semibold">{loveCount}</span>
             </Button>
           </div>
 
           {/* Additional Actions */}
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center justify-between gap-3">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setShowComments(!showComments)}
-              className="flex items-center gap-2 hover:text-primary hover:bg-primary/5"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl hover:text-primary hover:bg-primary/5 hover:shadow-sm transition-all"
             >
               <MessageCircle className="h-4 w-4" />
               <span className="text-xs font-medium">Comment</span>
@@ -258,19 +271,19 @@ export const PrayerCard = ({
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowGiftOptions(!showGiftOptions)}
-                className="flex items-center gap-2 hover:text-green-600 hover:bg-green-50"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl hover:text-emerald-600 hover:bg-emerald-50 hover:shadow-sm transition-all"
               >
                 <Gift className="h-4 w-4" />
                 <span className="text-xs font-medium">Send Gift</span>
               </Button>
               
               {showGiftOptions && (
-                <div className="absolute bottom-full mb-2 left-0 bg-background border border-border rounded-lg shadow-lg p-2 space-y-1 min-w-[140px] z-10">
+                <div className="absolute bottom-full mb-2 left-0 bg-card border border-border/50 rounded-xl shadow-elevated p-2 space-y-1 min-w-[160px] z-10">
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => handleGift("$5 Coffee")}
-                    className="w-full justify-start text-xs"
+                    className="w-full justify-start text-xs rounded-lg hover:bg-muted/50"
                   >
                     ☕ $5 Coffee
                   </Button>
@@ -278,7 +291,7 @@ export const PrayerCard = ({
                     variant="ghost"
                     size="sm"
                     onClick={() => handleGift("$10 Meal")}
-                    className="w-full justify-start text-xs"
+                    className="w-full justify-start text-xs rounded-lg hover:bg-muted/50"
                   >
                     🍽️ $10 Meal
                   </Button>
@@ -286,7 +299,7 @@ export const PrayerCard = ({
                     variant="ghost"
                     size="sm"
                     onClick={() => handleGift("Charity Donation")}
-                    className="w-full justify-start text-xs"
+                    className="w-full justify-start text-xs rounded-lg hover:bg-muted/50"
                   >
                     💝 Charity Donation
                   </Button>
@@ -297,30 +310,38 @@ export const PrayerCard = ({
 
           {/* Comments Section */}
           {showComments && (
-            <div className="mt-4 p-3 bg-muted/30 rounded-md">
-              <div className="space-y-2">
-                <div className="text-sm">
-                  <span className="font-medium text-foreground">Sarah M.</span>
-                  <span className="text-muted-foreground ml-2">Sending prayers your way 🙏</span>
-                </div>
-                <div className="text-sm">
-                  <span className="font-medium text-foreground">Michael K.</span>
-                  <span className="text-muted-foreground ml-2">You're in my thoughts</span>
-                </div>
+            <div className="mt-4 p-4 bg-muted/20 rounded-xl border border-border/30">
+              <div className="space-y-3 mb-4">
+                {comments.map((comment) => (
+                  <div key={comment.id} className="flex items-start gap-3 p-3 bg-background/60 rounded-lg">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <span className="text-xs font-medium text-primary">
+                        {comment.author === "You" ? "You" : comment.author.charAt(0)}
+                      </span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-sm font-medium text-foreground">{comment.author}</span>
+                        <span className="text-xs text-muted-foreground">{comment.timeAgo}</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground">{comment.text}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div className="mt-3 flex gap-2">
-                <form onSubmit={handleAddComment} className="flex gap-2 w-full">
-                  <input
-                    type="text"
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    onKeyPress={handleCommentKeyPress}
-                    placeholder="Add a comment..."
-                    className="flex-1 px-3 py-2 text-sm rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
-                  />
-                  <Button type="submit" size="sm" variant="outline">Post</Button>
-                </form>
-              </div>
+              <form onSubmit={handleAddComment} className="flex gap-2">
+                <input
+                  type="text"
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  onKeyPress={handleCommentKeyPress}
+                  placeholder="Add a comment..."
+                  className="flex-1 px-4 py-2.5 text-sm rounded-xl border border-border/50 bg-background/80 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all"
+                />
+                <Button type="submit" size="sm" className="px-4 py-2.5 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm">
+                  Post
+                </Button>
+              </form>
             </div>
           )}
         </div>

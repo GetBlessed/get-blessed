@@ -225,7 +225,7 @@ const Index = () => {
       {/* Hero Header */}
       <header className="bg-gradient-hero text-primary-foreground py-12 px-4">
         <div className="max-w-4xl mx-auto text-center space-y-6">
-          <h1 className="text-5xl font-bold tracking-tight">
+          <h1 className="text-5xl font-serif font-semibold tracking-tight">
             Welcome to GetBlessed
           </h1>
           <p className="text-xl opacity-90 max-w-2xl mx-auto leading-relaxed">

@@ -67,6 +67,10 @@ export default {
           ring: "hsl(var(--sidebar-ring))",
         },
       },
+      fontFamily: {
+        'sans': ['Inter', 'system-ui', 'sans-serif'],
+        'serif': ['Crimson Text', 'Georgia', 'serif'],
+      },
       backgroundImage: {
         'gradient-primary': 'var(--gradient-primary)',
         'gradient-blessing': 'var(--gradient-blessing)',
