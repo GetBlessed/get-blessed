@@ -110,9 +110,13 @@ export const PrayerCard = ({
                 {category}
               </div>
             )}
-            {organizationType === "organization" && (
+            {organizationType === "organization" ? (
               <div className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                 Organization
+              </div>
+            ) : (
+              <div className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                Individual
               </div>
             )}
           </div>

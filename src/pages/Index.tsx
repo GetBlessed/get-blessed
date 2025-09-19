@@ -17,6 +17,7 @@ interface Prayer {
   urgent: boolean;
   onBehalfOf: string;
   organizationType: "individual" | "organization";
+  scripture?: string;
 }
 
 // Mock data for initial prayers with more community samples
@@ -173,6 +174,9 @@ const Index = () => {
     urgent: boolean;
     onBehalfOf: string;
     organizationType: "individual" | "organization";
+    scripture?: string;
+    forwardEmail?: string;
+    forwardPhone?: string;
   }) => {
     const prayer = {
       id: Date.now().toString(),
@@ -183,6 +187,12 @@ const Index = () => {
     
     setPrayers(prev => [prayer, ...prev]);
     setShowSubmission(false);
+
+    // Handle forwarding if email or phone provided
+    if (newPrayer.forwardEmail || newPrayer.forwardPhone) {
+      // In real implementation, this would send the prayer via email/SMS
+      console.log(`Forwarding to: ${newPrayer.forwardEmail || newPrayer.forwardPhone}`);
+    }
   };
 
   const filteredPrayers = prayers.filter(prayer => {
