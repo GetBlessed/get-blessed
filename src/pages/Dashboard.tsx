@@ -17,6 +17,7 @@ interface DashboardProps {
     email: string;
   };
   onNavigateToHome?: () => void;
+  onLogout?: () => void;
 }
 
 interface UserProfile {
@@ -28,7 +29,7 @@ interface UserProfile {
   joinedDate: string;
 }
 
-const Dashboard = ({ user, onNavigateToHome }: DashboardProps) => {
+const Dashboard = ({ user, onNavigateToHome, onLogout }: DashboardProps) => {
   const [activeTab, setActiveTab] = useState("overview");
   const [showPrayerSubmission, setShowPrayerSubmission] = useState(false);
   const [editingProfile, setEditingProfile] = useState(false);
@@ -44,6 +45,54 @@ const Dashboard = ({ user, onNavigateToHome }: DashboardProps) => {
     profilePicture: null,
     joinedDate: "January 2024"
   });
+
+  // Mock community prayers data
+  const communityPrayers = [
+    {
+      id: "comm-1",
+      content: "Praying for healing and strength for all those battling illness. May they find peace and recovery.",
+      type: "prayer" as const,
+      author: "Sarah Johnson",
+      supportCount: 47,
+      timeAgo: "2 hours ago",
+      category: "Health",
+      anonymous: false,
+      urgent: false
+    },
+    {
+      id: "comm-2", 
+      content: "Blessed to witness such kindness in our community today. Grateful for neighbors helping neighbors.",
+      type: "blessing" as const,
+      author: "Michael Chen",
+      supportCount: 23,
+      timeAgo: "4 hours ago",
+      category: "Gratitude",
+      anonymous: false,
+      urgent: false
+    },
+    {
+      id: "comm-3",
+      content: "Sending prayers for world peace and understanding between all nations and peoples.",
+      type: "prayer" as const,
+      author: "Anonymous",
+      supportCount: 89,
+      timeAgo: "6 hours ago", 
+      category: "Peace",
+      anonymous: true,
+      urgent: false
+    },
+    {
+      id: "comm-4",
+      content: "Feeling blessed by the beautiful sunrise this morning. Nature reminds us of life's endless possibilities.",
+      type: "blessing" as const,
+      author: "Emma Rodriguez",
+      supportCount: 34,
+      timeAgo: "8 hours ago",
+      category: "Nature",
+      anonymous: false,
+      urgent: false
+    }
+  ];
 
   // Dynamic user data based on actual user
   const userData = {
@@ -509,33 +558,43 @@ const Dashboard = ({ user, onNavigateToHome }: DashboardProps) => {
       case "community":
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-serif font-semibold text-foreground">Community</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card className="p-6 rounded-2xl border-border/30 shadow-soft hover:shadow-medium cursor-pointer transition-all">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center">
-                    <Users className="h-6 w-6 text-green-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-foreground">Prayer Circles</h3>
-                    <p className="text-sm text-muted-foreground">Join active circles</p>
-                  </div>
-                </div>
-                <p className="text-sm text-muted-foreground">Connect with like-minded souls in dedicated prayer groups</p>
-              </Card>
-              
-              <Card onClick={handleExploreCommunity} className="p-6 rounded-2xl border-border/30 shadow-soft hover:shadow-medium cursor-pointer transition-all">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center">
-                    <MessageCircle className="h-6 w-6 text-purple-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-foreground">Community Feed</h3>
-                    <p className="text-sm text-muted-foreground">Latest prayers & blessings</p>
-                  </div>
-                </div>
-                <p className="text-sm text-muted-foreground">See what the community is sharing and praying for</p>
-              </Card>
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-serif font-semibold text-foreground">Community Prayers & Blessings</h2>
+              <Button 
+                onClick={() => onNavigateToHome?.()}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                <Globe className="h-4 w-4" />
+                View Full Community Feed
+              </Button>
+            </div>
+            
+            <div className="space-y-4">
+              {communityPrayers.map((prayer) => (
+                <PrayerCard 
+                  key={prayer.id}
+                  id={prayer.id}
+                  content={prayer.content}
+                  type={prayer.type}
+                  author={prayer.author}
+                  supportCount={prayer.supportCount}
+                  timeAgo={prayer.timeAgo}
+                  category={prayer.category}
+                  anonymous={prayer.anonymous}
+                  urgent={prayer.urgent}
+                />
+              ))}
+            </div>
+            
+            <div className="text-center">
+              <Button 
+                onClick={() => onNavigateToHome?.()}
+                variant="ghost"
+                className="text-primary hover:text-primary/80"
+              >
+                See all community posts →
+              </Button>
             </div>
           </div>
         );
@@ -564,9 +623,14 @@ const Dashboard = ({ user, onNavigateToHome }: DashboardProps) => {
               <Globe className="h-4 w-4" />
               Community Feed
             </Button>
-            <Button variant="outline" size="sm" className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="flex items-center gap-2"
+              onClick={() => onLogout?.()}
+            >
               <User className="h-4 w-4" />
-              {user.name} • Dashboard
+              {user.name} • Sign Out
             </Button>
           </div>
         </div>

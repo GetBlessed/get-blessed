@@ -270,7 +270,7 @@ const Index = () => {
             className="flex items-center gap-2 px-4 py-2 rounded-xl font-medium"
           >
             <Heart className="h-4 w-4" />
-            My Prayers
+            My Dashboard
           </Button>
           <Button
             variant={currentView === "gifts" ? "default" : "ghost"}
@@ -287,7 +287,7 @@ const Index = () => {
   );
 
   if (currentView === "my-prayers" && user) {
-    return <Dashboard user={user} onNavigateToHome={() => setCurrentView("home")} />;
+    return <Dashboard user={user} onNavigateToHome={() => setCurrentView("home")} onLogout={handleLogout} />;
   }
 
   if (currentView === "gifts") {
