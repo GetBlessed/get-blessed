@@ -3,7 +3,7 @@ import { PrayerCard } from "@/components/PrayerCard";
 import { PrayerSubmission } from "@/components/PrayerSubmission";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Heart, Users } from "lucide-react";
+import { Plus, Heart, Users, User } from "lucide-react";
 
 interface Prayer {
   id: string;
@@ -19,7 +19,7 @@ interface Prayer {
   organizationType: "individual" | "organization";
 }
 
-// Mock data for initial prayers
+// Mock data for initial prayers with more community samples
 const initialPrayers: Prayer[] = [
   {
     id: "1",
@@ -85,6 +85,45 @@ const initialPrayers: Prayer[] = [
     urgent: false,
     onBehalfOf: "My family",
     organizationType: "individual"
+  },
+  {
+    id: "6",
+    content: "Our food bank is organizing a community drive this weekend. Praying for generous hearts and abundant donations to help feed families in need during these challenging times.",
+    type: "prayer",
+    author: "Community Food Bank",
+    supportCount: 67,
+    timeAgo: "1 day ago",
+    category: "General",
+    anonymous: false,
+    urgent: false,
+    onBehalfOf: "Families in need",
+    organizationType: "organization"
+  },
+  {
+    id: "7",
+    content: "We are overwhelmed with gratitude! Thanks to our amazing community, we collected over 2,000 pounds of food and raised $15,000 for local families. Your generosity is a true blessing.",
+    type: "blessing",
+    author: "Helping Hands Nonprofit",
+    supportCount: 89,
+    timeAgo: "2 days ago",
+    category: "Gratitude",
+    anonymous: false,
+    urgent: false,
+    onBehalfOf: "Community donors",
+    organizationType: "organization"
+  },
+  {
+    id: "8",
+    content: "May all who are seeking healing find comfort and strength today. May your journey be filled with hope, love, and the support of those around you. Blessings to each precious soul.",
+    type: "blessing",
+    author: "St. Mary's Interfaith Center",
+    supportCount: 156,
+    timeAgo: "3 days ago",
+    category: "Health",
+    anonymous: false,
+    urgent: false,
+    onBehalfOf: "All seeking healing",
+    organizationType: "organization"
   }
 ];
 
@@ -131,11 +170,25 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Navigation Header */}
+      <nav className="bg-background border-b border-border/50 px-4 py-3">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <h1 className="text-xl font-bold text-primary">GetBlessed</h1>
+            <span className="text-xs text-muted-foreground">• Connecting hearts through prayer</span>
+          </div>
+          <Button variant="outline" size="sm" className="flex items-center gap-2">
+            <User className="h-4 w-4" />
+            Create Profile
+          </Button>
+        </div>
+      </nav>
+
       {/* Hero Header */}
       <header className="bg-gradient-hero text-primary-foreground py-12 px-4">
         <div className="max-w-4xl mx-auto text-center space-y-6">
           <h1 className="text-5xl font-bold tracking-tight">
-            Get Blessed
+            Welcome to GetBlessed
           </h1>
           <p className="text-xl opacity-90 max-w-2xl mx-auto leading-relaxed">
             A community where hearts connect through prayer and blessing. 

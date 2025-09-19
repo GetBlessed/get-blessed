@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Heart, MessageCircle, Users, Send, Gift, AlertCircle } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 interface PrayerCardProps {
   id: string;
@@ -37,26 +38,57 @@ export const PrayerCard = ({
   const [hasPrayed, setHasPrayed] = useState(false);
   const [hasSentLove, setHasSentLove] = useState(false);
   const [showComments, setShowComments] = useState(false);
+  const [showGiftOptions, setShowGiftOptions] = useState(false);
+  const { toast } = useToast();
 
   const handleSupport = () => {
-    if (!hasSupported) {
+    if (hasSupported) {
+      setSupportCount(prev => prev - 1);
+      setHasSupported(false);
+    } else {
       setSupportCount(prev => prev + 1);
       setHasSupported(true);
+      toast({
+        title: "Support sent! 💙",
+        description: "Your support means the world to them.",
+      });
     }
   };
 
   const handlePraying = () => {
-    if (!hasPrayed) {
+    if (hasPrayed) {
+      setPrayingCount(prev => prev - 1);
+      setHasPrayed(false);
+    } else {
       setPrayingCount(prev => prev + 1);
       setHasPrayed(true);
+      toast({
+        title: "Prayer sent! 🙏",
+        description: "Your prayers are lifting them up.",
+      });
     }
   };
 
   const handleSendLove = () => {
-    if (!hasSentLove) {
+    if (hasSentLove) {
+      setLoveCount(prev => prev - 1);
+      setHasSentLove(false);
+    } else {
       setLoveCount(prev => prev + 1);
       setHasSentLove(true);
+      toast({
+        title: "Love sent! ❤️",
+        description: "Your love is spreading hope.",
+      });
     }
+  };
+
+  const handleGift = (giftType: string) => {
+    toast({
+      title: `${giftType} sent! 🎁`,
+      description: "Your generosity will make a difference.",
+    });
+    setShowGiftOptions(false);
   };
 
   const getInitials = (name: string) => {
@@ -129,14 +161,13 @@ export const PrayerCard = ({
               variant="ghost"
               size="sm"
               onClick={handleSupport}
-              className={`flex items-center gap-2 transition-colors ${
+              className={`flex items-center gap-2 transition-all duration-300 ${
                 hasSupported 
-                  ? 'text-primary bg-primary/10' 
+                  ? 'text-primary bg-primary/10 animate-celebrate' 
                   : 'hover:text-primary hover:bg-primary/5'
               }`}
-              disabled={hasSupported}
             >
-              <Heart className={`h-4 w-4 ${hasSupported ? 'fill-current' : ''}`} />
+              <Heart className={`h-4 w-4 transition-all ${hasSupported ? 'fill-current animate-heart-beat' : ''}`} />
               <span className="text-xs font-medium">I'm with you!</span>
               <span className="text-xs">{supportCount}</span>
             </Button>
@@ -146,12 +177,11 @@ export const PrayerCard = ({
                 variant="ghost"
                 size="sm" 
                 onClick={handlePraying}
-                className={`flex items-center gap-2 transition-colors ${
+                className={`flex items-center gap-2 transition-all duration-300 ${
                   hasPrayed 
-                    ? 'text-blue-600 bg-blue-50' 
+                    ? 'text-blue-600 bg-blue-50 animate-bounce-gentle' 
                     : 'hover:text-blue-600 hover:bg-blue-50'
                 }`}
-                disabled={hasPrayed}
               >
                 <Users className={`h-4 w-4 ${hasPrayed ? 'fill-current' : ''}`} />
                 <span className="text-xs font-medium">Praying for you</span>
@@ -163,12 +193,11 @@ export const PrayerCard = ({
               variant="ghost"
               size="sm"
               onClick={handleSendLove}
-              className={`flex items-center gap-2 transition-colors ${
+              className={`flex items-center gap-2 transition-all duration-300 ${
                 hasSentLove 
-                  ? 'text-pink-600 bg-pink-50' 
+                  ? 'text-pink-600 bg-pink-50 animate-pulse-love' 
                   : 'hover:text-pink-600 hover:bg-pink-50'
               }`}
-              disabled={hasSentLove}
             >
               <Send className={`h-4 w-4 ${hasSentLove ? 'fill-current' : ''}`} />
               <span className="text-xs font-medium">Sending love</span>
@@ -188,14 +217,46 @@ export const PrayerCard = ({
               <span className="text-xs font-medium">Comment</span>
             </Button>
             
-            <Button
-              variant="ghost"
-              size="sm"
-              className="flex items-center gap-2 hover:text-green-600 hover:bg-green-50"
-            >
-              <Gift className="h-4 w-4" />
-              <span className="text-xs font-medium">Send Gift</span>
-            </Button>
+            <div className="relative">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowGiftOptions(!showGiftOptions)}
+                className="flex items-center gap-2 hover:text-green-600 hover:bg-green-50"
+              >
+                <Gift className="h-4 w-4" />
+                <span className="text-xs font-medium">Send Gift</span>
+              </Button>
+              
+              {showGiftOptions && (
+                <div className="absolute bottom-full mb-2 left-0 bg-background border border-border rounded-lg shadow-lg p-2 space-y-1 min-w-[140px] z-10">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleGift("$5 Coffee")}
+                    className="w-full justify-start text-xs"
+                  >
+                    ☕ $5 Coffee
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleGift("$10 Meal")}
+                    className="w-full justify-start text-xs"
+                  >
+                    🍽️ $10 Meal
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleGift("Charity Donation")}
+                    className="w-full justify-start text-xs"
+                  >
+                    💝 Charity Donation
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Comments Section */}

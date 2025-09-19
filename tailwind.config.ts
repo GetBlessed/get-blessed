@@ -104,10 +104,23 @@ export default {
             height: "0",
           },
         },
+        "celebrate": {
+          "0%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.1) rotate(2deg)" },
+          "100%": { transform: "scale(1) rotate(0deg)" }
+        },
+        "heartbeat": {
+          "0%, 100%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.05)" }
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "bounce-gentle": "bounce 0.6s ease-in-out",
+        "pulse-love": "pulse 0.8s ease-in-out",
+        "celebrate": "celebrate 0.5s ease-out",
+        "heart-beat": "heartbeat 1s ease-in-out infinite",
       },
     },
   },

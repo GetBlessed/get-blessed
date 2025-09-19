@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Send, Heart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Switch } from "@/components/ui/switch";
 
 interface PrayerSubmissionProps {
   onSubmit: (prayer: {
@@ -71,8 +72,8 @@ export const PrayerSubmission = ({ onSubmit }: PrayerSubmissionProps) => {
       setOrganizationType("individual");
       
       toast({
-        title: type === "prayer" ? "Prayer shared" : "Blessing sent",
-        description: "Your message has been shared with the community.",
+        title: type === "prayer" ? "Prayer shared! 🙏" : "Blessing sent! ✨",
+        description: "Your heartfelt message has been shared with the community.",
       });
     } catch (error) {
       toast({
@@ -203,29 +204,25 @@ export const PrayerSubmission = ({ onSubmit }: PrayerSubmissionProps) => {
 
         {/* Options */}
         <div className="grid grid-cols-2 gap-4">
-          <div className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              id="anonymous"
-              checked={anonymous}
-              onChange={(e) => setAnonymous(e.target.checked)}
-              className="rounded border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground focus:ring-primary-foreground/50"
-            />
-            <Label htmlFor="anonymous" className="text-primary-foreground text-sm">
+          <div className="flex items-center justify-between space-x-3">
+            <Label htmlFor="anonymous" className="text-primary-foreground text-sm font-medium">
               Post anonymously
             </Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              id="urgent"
-              checked={urgent}
-              onChange={(e) => setUrgent(e.target.checked)}
-              className="rounded border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground focus:ring-primary-foreground/50"
+            <Switch
+              id="anonymous"
+              checked={anonymous}
+              onCheckedChange={setAnonymous}
             />
-            <Label htmlFor="urgent" className="text-primary-foreground text-sm">
+          </div>
+          <div className="flex items-center justify-between space-x-3">
+            <Label htmlFor="urgent" className="text-primary-foreground text-sm font-medium">
               Mark as urgent
             </Label>
+            <Switch
+              id="urgent"
+              checked={urgent}
+              onCheckedChange={setUrgent}
+            />
           </div>
         </div>
 
