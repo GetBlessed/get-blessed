@@ -68,8 +68,8 @@ export default {
         },
       },
       fontFamily: {
-        'sans': ['Inter', 'system-ui', 'sans-serif'],
-        'serif': ['Crimson Text', 'Georgia', 'serif'],
+        'sans': ['Poppins', 'system-ui', 'sans-serif'],
+        'serif': ['Lora', 'Georgia', 'serif'],
       },
       backgroundImage: {
         'gradient-primary': 'var(--gradient-primary)',

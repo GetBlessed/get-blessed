@@ -8,56 +8,56 @@ All colors MUST be HSL for proper semantic token usage.
 
 @layer base {
   :root {
-    /* Core Brand Colors - Accessible, soft, calming palette */
-    --background: 222 15% 98%;
-    --foreground: 222 18% 11%;
+    /* Warm, encouraging color palette for better visibility */
+    --background: 45 25% 98%;
+    --foreground: 240 15% 9%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222 18% 11%;
+    --card-foreground: 240 15% 9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 18% 11%;
+    --popover-foreground: 240 15% 9%;
 
-    /* Primary - Gentle, accessible blue */
-    --primary: 217 75% 45%;
+    /* Warmer, more approachable primary */
+    --primary: 250 75% 60%;
     --primary-foreground: 0 0% 100%;
-    --primary-soft: 217 60% 96%;
+    --primary-soft: 250 60% 97%;
 
-    /* Secondary - Soft, supportive lavender */
-    --secondary: 250 25% 88%;
-    --secondary-foreground: 250 30% 25%;
+    /* Soft, comforting secondary */
+    --secondary: 30 35% 92%;
+    --secondary-foreground: 30 45% 20%;
 
-    /* Muted tones - Better contrast */
-    --muted: 222 15% 93%;
-    --muted-foreground: 222 20% 45%;
+    /* Better contrast muted tones */
+    --muted: 45 20% 94%;
+    --muted-foreground: 240 15% 35%;
 
-    /* Accent - Gentle warmth */
-    --accent: 30 40% 94%;
-    --accent-foreground: 30 50% 25%;
+    /* Warm accent */
+    --accent: 35 45% 95%;
+    --accent-foreground: 35 55% 25%;
 
     --destructive: 0 65% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 222 15% 88%;
-    --input: 222 20% 95%;
-    --ring: 217 75% 45%;
+    --border: 45 15% 88%;
+    --input: 45 20% 96%;
+    --ring: 250 75% 60%;
 
-    /* Blessing Colors - Soft, encouraging */
-    --blessing: 250 100% 98%;
-    --blessing-foreground: 250 45% 25%;
-    --prayer: 200 100% 97%;
-    --prayer-foreground: 200 50% 25%;
+    /* Softer, more visible blessing/prayer colors */
+    --blessing: 320 35% 96%;
+    --blessing-foreground: 320 40% 25%;
+    --prayer: 200 40% 96%;
+    --prayer-foreground: 200 45% 25%;
 
-    /* Softer, more harmonious gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(217 75% 45%), hsl(240 70% 55%));
-    --gradient-blessing: linear-gradient(135deg, hsl(250 100% 98%), hsl(230 60% 96%));
-    --gradient-prayer: linear-gradient(135deg, hsl(200 100% 97%), hsl(190 60% 95%));
-    --gradient-hero: linear-gradient(135deg, hsl(217 75% 45%), hsl(250 70% 55%));
+    /* Warmer, more inviting gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(250 75% 60%), hsl(280 70% 65%));
+    --gradient-blessing: linear-gradient(135deg, hsl(320 35% 98%), hsl(300 30% 96%));
+    --gradient-prayer: linear-gradient(135deg, hsl(200 40% 98%), hsl(220 35% 96%));
+    --gradient-hero: linear-gradient(135deg, hsl(250 75% 60%), hsl(280 70% 65%));
 
-    /* Gentle shadows for depth */
-    --shadow-soft: 0 2px 8px -2px hsl(222 20% 20% / 0.06);
-    --shadow-medium: 0 4px 16px -4px hsl(222 20% 20% / 0.08);
-    --shadow-elevated: 0 8px 32px -8px hsl(222 20% 20% / 0.12);
+    /* Softer shadows */
+    --shadow-soft: 0 2px 8px -2px hsl(240 15% 15% / 0.06);
+    --shadow-medium: 0 4px 16px -4px hsl(240 15% 15% / 0.08);
+    --shadow-elevated: 0 8px 32px -8px hsl(240 15% 15% / 0.12);
 
     /* Animation tokens */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
