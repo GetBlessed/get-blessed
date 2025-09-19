@@ -547,6 +547,31 @@ const Dashboard = ({ user, onNavigateToHome }: DashboardProps) => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Top Navigation Bar */}
+      <nav className="bg-background border-b border-border/50 px-4 py-3">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <h1 className="text-xl font-bold text-primary">GetBlessed</h1>
+            <span className="text-xs text-muted-foreground">• Connecting hearts through prayer</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={onNavigateToHome}
+              className="flex items-center gap-2"
+            >
+              <Globe className="h-4 w-4" />
+              Community Feed
+            </Button>
+            <Button variant="outline" size="sm" className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              {user.name} • Dashboard
+            </Button>
+          </div>
+        </div>
+      </nav>
+
       {/* Header with gradient background matching reference */}
       <div 
         className="text-white px-6 py-8 relative overflow-hidden"
@@ -573,7 +598,7 @@ const Dashboard = ({ user, onNavigateToHome }: DashboardProps) => {
               className="bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm rounded-xl px-6 py-3 font-medium"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Give Prayer
+              Give Prayer or Blessing
             </Button>
           </div>
         </div>
