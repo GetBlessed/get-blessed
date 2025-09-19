@@ -124,6 +124,32 @@ const initialPrayers: Prayer[] = [
     urgent: false,
     onBehalfOf: "All seeking healing",
     organizationType: "organization"
+  },
+  {
+    id: "9",
+    content: "Our local community was affected by recent flooding. We're seeking prayers for recovery, rebuilding, and hope for everyone impacted.",
+    type: "prayer",
+    author: "Peace Unity Church",
+    supportCount: 156,
+    timeAgo: "5 hours ago",
+    category: "General",
+    anonymous: false,
+    urgent: false,
+    onBehalfOf: "Our community",
+    organizationType: "organization"
+  },
+  {
+    id: "10",
+    content: "Join us in praying for peace, understanding, and harmony across all nations and communities worldwide.",
+    type: "prayer",
+    author: "Global Peace Initiative",
+    supportCount: 312,
+    timeAgo: "12 hours ago",
+    category: "General",
+    anonymous: false,
+    urgent: false,
+    onBehalfOf: "All nations",
+    organizationType: "organization"
   }
 ];
 
