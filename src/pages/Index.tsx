@@ -2,60 +2,97 @@ import { useState } from "react";
 import { PrayerCard } from "@/components/PrayerCard";
 import { PrayerSubmission } from "@/components/PrayerSubmission";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Heart, Users } from "lucide-react";
 
+interface Prayer {
+  id: string;
+  content: string;
+  type: "prayer" | "blessing";
+  author: string;
+  supportCount: number;
+  timeAgo: string;
+  category: string;
+  anonymous: boolean;
+  urgent: boolean;
+  onBehalfOf: string;
+  organizationType: "individual" | "organization";
+}
+
 // Mock data for initial prayers
-const initialPrayers = [
+const initialPrayers: Prayer[] = [
   {
     id: "1",
     content: "Going through a difficult time with my health. Would appreciate prayers for strength and healing during my treatment journey.",
-    type: "prayer" as const,
+    type: "prayer",
     author: "Sarah M.",
     supportCount: 24,
     timeAgo: "2 hours ago",
-    category: "Health"
+    category: "Health",
+    anonymous: false,
+    urgent: true,
+    onBehalfOf: "",
+    organizationType: "individual"
   },
   {
     id: "2",
     content: "Grateful for the wonderful news about my sister's recovery. Sending blessings to everyone who supported us during this time.",
-    type: "blessing" as const,
+    type: "blessing",
     author: "Michael K.",
     supportCount: 18,
     timeAgo: "4 hours ago",
-    category: "Gratitude"
+    category: "Gratitude",
+    anonymous: false,
+    urgent: false,
+    onBehalfOf: "My sister",
+    organizationType: "individual"
   },
   {
     id: "3",
     content: "Starting a new job next week and feeling nervous. Prayers for confidence and wisdom would mean the world to me.",
-    type: "prayer" as const,
+    type: "prayer",
     author: "David L.",
     supportCount: 31,
     timeAgo: "6 hours ago",
-    category: "Work"
+    category: "Work",
+    anonymous: false,
+    urgent: false,
+    onBehalfOf: "",
+    organizationType: "individual"
   },
   {
     id: "4",
     content: "Blessing everyone who's struggling today. Remember that you are loved, valued, and stronger than you know. Peace be with you all.",
-    type: "blessing" as const,
-    author: "Maria G.",
+    type: "blessing",
+    author: "Hope Community Church",
     supportCount: 42,
     timeAgo: "8 hours ago",
-    category: "General"
+    category: "General",
+    anonymous: false,
+    urgent: false,
+    onBehalfOf: "Our community",
+    organizationType: "organization"
   },
   {
     id: "5",
     content: "My family is going through a tough financial situation. Prayers for guidance and opportunities would be deeply appreciated.",
-    type: "prayer" as const,
-    author: "James R.",
+    type: "prayer",
+    author: "Anonymous",
     supportCount: 19,
     timeAgo: "12 hours ago",
-    category: "Family"
+    category: "Family",
+    anonymous: true,
+    urgent: false,
+    onBehalfOf: "My family",
+    organizationType: "individual"
   }
 ];
 
 const Index = () => {
   const [prayers, setPrayers] = useState(initialPrayers);
   const [showSubmission, setShowSubmission] = useState(false);
+  const [activeTab, setActiveTab] = useState("prayers");
+  const [activeFilter, setActiveFilter] = useState("all");
   const [stats] = useState({
     totalPrayers: 1247,
     totalBlessings: 892,
@@ -67,6 +104,10 @@ const Index = () => {
     type: "prayer" | "blessing";
     category: string;
     author: string;
+    anonymous: boolean;
+    urgent: boolean;
+    onBehalfOf: string;
+    organizationType: "individual" | "organization";
   }) => {
     const prayer = {
       id: Date.now().toString(),
@@ -78,6 +119,15 @@ const Index = () => {
     setPrayers(prev => [prayer, ...prev]);
     setShowSubmission(false);
   };
+
+  const filteredPrayers = prayers.filter(prayer => {
+    const typeFilter = activeTab === "prayers" ? prayer.type === "prayer" : prayer.type === "blessing";
+    const organizationFilter = activeFilter === "all" ? true : 
+      activeFilter === "individual" ? prayer.organizationType === "individual" :
+      prayer.organizationType === "organization";
+    
+    return typeFilter && organizationFilter;
+  });
 
   return (
     <div className="min-h-screen bg-background">
@@ -130,24 +180,105 @@ const Index = () => {
           </div>
         )}
 
-        {/* Community Feed */}
-        <div className="space-y-6">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-foreground mb-2">
-              Community Feed
+        {/* Community Feed with Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold text-foreground mb-4">
+              See how our community supports each other through prayers and celebrates answered blessings
             </h2>
-            <p className="text-muted-foreground">
-              Recent prayers and blessings from our community
-            </p>
+            
+            <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 bg-muted">
+              <TabsTrigger value="prayers" className="text-sm font-medium">
+                Community Prayers
+              </TabsTrigger>
+              <TabsTrigger value="blessings" className="text-sm font-medium">
+                Gratitude & Thanks
+              </TabsTrigger>
+            </TabsList>
           </div>
 
-          {prayers.map((prayer) => (
-            <PrayerCard
-              key={prayer.id}
-              {...prayer}
-            />
-          ))}
-        </div>
+          <TabsContent value="prayers" className="space-y-6">
+            {/* Filter Tabs for Prayers */}
+            <div className="flex justify-center">
+              <div className="inline-flex rounded-lg border border-border/50 p-1 bg-muted/30">
+                <Button
+                  variant={activeFilter === "all" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setActiveFilter("all")}
+                  className="text-sm"
+                >
+                  All Prayers
+                </Button>
+                <Button
+                  variant={activeFilter === "individual" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setActiveFilter("individual")}
+                  className="text-sm"
+                >
+                  Individual
+                </Button>
+                <Button
+                  variant={activeFilter === "organization" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setActiveFilter("organization")}
+                  className="text-sm"
+                >
+                  Groups & Organizations
+                </Button>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              {filteredPrayers.map((prayer) => (
+                <PrayerCard
+                  key={prayer.id}
+                  {...prayer}
+                />
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="blessings" className="space-y-6">
+            {/* Filter Tabs for Blessings */}
+            <div className="flex justify-center">
+              <div className="inline-flex rounded-lg border border-border/50 p-1 bg-muted/30">
+                <Button
+                  variant={activeFilter === "all" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setActiveFilter("all")}
+                  className="text-sm"
+                >
+                  All Blessings
+                </Button>
+                <Button
+                  variant={activeFilter === "individual" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setActiveFilter("individual")}
+                  className="text-sm"
+                >
+                  Individual
+                </Button>
+                <Button
+                  variant={activeFilter === "organization" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setActiveFilter("organization")}
+                  className="text-sm"
+                >
+                  Groups & Organizations
+                </Button>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              {filteredPrayers.map((prayer) => (
+                <PrayerCard
+                  key={prayer.id}
+                  {...prayer}
+                />
+              ))}
+            </div>
+          </TabsContent>
+        </Tabs>
 
         {/* Community Guidelines */}
         <div className="mt-16 p-6 bg-card rounded-lg border border-border/50 shadow-soft">

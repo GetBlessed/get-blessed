@@ -13,6 +13,10 @@ interface PrayerSubmissionProps {
     type: "prayer" | "blessing";
     category: string;
     author: string;
+    anonymous: boolean;
+    urgent: boolean;
+    onBehalfOf: string;
+    organizationType: "individual" | "organization";
   }) => void;
 }
 
@@ -21,6 +25,10 @@ export const PrayerSubmission = ({ onSubmit }: PrayerSubmissionProps) => {
   const [type, setType] = useState<"prayer" | "blessing">("prayer");
   const [category, setCategory] = useState("");
   const [author, setAuthor] = useState("");
+  const [anonymous, setAnonymous] = useState(false);
+  const [urgent, setUrgent] = useState(false);
+  const [onBehalfOf, setOnBehalfOf] = useState("");
+  const [organizationType, setOrganizationType] = useState<"individual" | "organization">("individual");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
@@ -46,6 +54,10 @@ export const PrayerSubmission = ({ onSubmit }: PrayerSubmissionProps) => {
         type,
         category: category || "General",
         author: author.trim(),
+        anonymous,
+        urgent,
+        onBehalfOf: onBehalfOf.trim(),
+        organizationType,
       });
 
       // Reset form
@@ -53,6 +65,10 @@ export const PrayerSubmission = ({ onSubmit }: PrayerSubmissionProps) => {
       setAuthor("");
       setCategory("");
       setType("prayer");
+      setAnonymous(false);
+      setUrgent(false);
+      setOnBehalfOf("");
+      setOrganizationType("individual");
       
       toast({
         title: type === "prayer" ? "Prayer shared" : "Blessing sent",
@@ -139,19 +155,78 @@ export const PrayerSubmission = ({ onSubmit }: PrayerSubmissionProps) => {
           </div>
         </div>
 
+        {/* Organization Type */}
+        <div className="space-y-2">
+          <Label htmlFor="organizationType" className="text-primary-foreground font-medium">
+            Posting as:
+          </Label>
+          <Select value={organizationType} onValueChange={(value: "individual" | "organization") => setOrganizationType(value)}>
+            <SelectTrigger className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="individual">Individual</SelectItem>
+              <SelectItem value="organization">Organization/Group</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
         {/* Author */}
         <div className="space-y-2">
           <Label htmlFor="author" className="text-primary-foreground font-medium">
-            Your name:
+            {organizationType === "individual" ? "Your name:" : "Organization name:"}
           </Label>
           <input
             id="author"
             value={author}
             onChange={(e) => setAuthor(e.target.value)}
-            placeholder="How would you like to be known?"
+            placeholder={organizationType === "individual" ? "How would you like to be known?" : "Organization or group name"}
             className="w-full px-3 py-2 rounded-md bg-primary-foreground/10 border border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary-foreground/50"
             maxLength={50}
           />
+        </div>
+
+        {/* On Behalf Of */}
+        <div className="space-y-2">
+          <Label htmlFor="onBehalfOf" className="text-primary-foreground font-medium">
+            On behalf of (optional):
+          </Label>
+          <input
+            id="onBehalfOf"
+            value={onBehalfOf}
+            onChange={(e) => setOnBehalfOf(e.target.value)}
+            placeholder="Who are you praying for or on behalf of?"
+            className="w-full px-3 py-2 rounded-md bg-primary-foreground/10 border border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary-foreground/50"
+            maxLength={100}
+          />
+        </div>
+
+        {/* Options */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="anonymous"
+              checked={anonymous}
+              onChange={(e) => setAnonymous(e.target.checked)}
+              className="rounded border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground focus:ring-primary-foreground/50"
+            />
+            <Label htmlFor="anonymous" className="text-primary-foreground text-sm">
+              Post anonymously
+            </Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="urgent"
+              checked={urgent}
+              onChange={(e) => setUrgent(e.target.checked)}
+              className="rounded border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground focus:ring-primary-foreground/50"
+            />
+            <Label htmlFor="urgent" className="text-primary-foreground text-sm">
+              Mark as urgent
+            </Label>
+          </div>
         </div>
 
         {/* Submit Button */}
