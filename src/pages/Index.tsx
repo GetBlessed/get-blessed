@@ -287,7 +287,7 @@ const Index = () => {
   );
 
   if (currentView === "my-prayers" && user) {
-    return <Dashboard />;
+    return <Dashboard user={user} />;
   }
 
   if (currentView === "gifts") {
