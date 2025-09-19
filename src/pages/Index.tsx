@@ -287,7 +287,7 @@ const Index = () => {
   );
 
   if (currentView === "my-prayers" && user) {
-    return <Dashboard user={user} />;
+    return <Dashboard user={user} onNavigateToHome={() => setCurrentView("home")} />;
   }
 
   if (currentView === "gifts") {
