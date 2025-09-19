@@ -610,7 +610,6 @@ const Dashboard = ({ user, onNavigateToHome, onLogout }: DashboardProps) => {
       <nav className="bg-background border-b border-border/50 px-4 py-3">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src="/src/assets/logo.png" alt="GetBlessed" className="h-8 w-8" />
             <h1 className="text-xl font-bold text-primary">GetBlessed</h1>
             <span className="text-xs text-muted-foreground">• Connecting hearts through prayer</span>
           </div>
