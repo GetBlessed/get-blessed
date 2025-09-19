@@ -216,3 +216,5 @@ export const AuthModal = ({ isOpen, onClose, onLogin }: AuthModalProps) => {
     </div>
   );
 };
+
+export default AuthModal;

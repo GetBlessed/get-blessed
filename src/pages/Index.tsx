@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { PrayerCard } from "@/components/PrayerCard";
 import { PrayerSubmission } from "@/components/PrayerSubmission";
-import { AuthModal } from "@/components/AuthModal";
+import AuthModal from "@/components/AuthModal";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Heart, Users, User, Home, Gift } from "lucide-react";
