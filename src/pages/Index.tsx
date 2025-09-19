@@ -18,6 +18,7 @@ interface Prayer {
   onBehalfOf: string;
   organizationType: "individual" | "organization";
   scripture?: string;
+  image?: string;
 }
 
 // Mock data for initial prayers with more community samples
@@ -177,6 +178,7 @@ const Index = () => {
     scripture?: string;
     forwardEmail?: string;
     forwardPhone?: string;
+    image?: string;
   }) => {
     const prayer = {
       id: Date.now().toString(),

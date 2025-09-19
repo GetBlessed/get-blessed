@@ -17,6 +17,7 @@ interface PrayerCardProps {
   urgent?: boolean;
   onBehalfOf?: string;
   organizationType?: "individual" | "organization";
+  image?: string;
 }
 
 export const PrayerCard = ({ 
@@ -29,7 +30,8 @@ export const PrayerCard = ({
   anonymous = false,
   urgent = false,
   onBehalfOf,
-  organizationType = "individual"
+  organizationType = "individual",
+  image
 }: PrayerCardProps) => {
   const [supportCount, setSupportCount] = useState(initialSupportCount);
   const [prayingCount, setPrayingCount] = useState(Math.floor(Math.random() * 15) + 5);
@@ -39,6 +41,7 @@ export const PrayerCard = ({
   const [hasSentLove, setHasSentLove] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [showGiftOptions, setShowGiftOptions] = useState(false);
+  const [newComment, setNewComment] = useState("");
   const { toast } = useToast();
 
   const handleSupport = () => {
@@ -91,6 +94,24 @@ export const PrayerCard = ({
     setShowGiftOptions(false);
   };
 
+  const handleAddComment = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newComment.trim()) return;
+    
+    toast({
+      title: "Comment added! 💬",
+      description: "Your comment has been shared.",
+    });
+    setNewComment("");
+  };
+
+  const handleCommentKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleAddComment(e);
+    }
+  };
+
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
   };
@@ -100,7 +121,7 @@ export const PrayerCard = ({
       type === 'prayer' 
         ? 'bg-gradient-prayer border-prayer/20' 
         : 'bg-gradient-blessing border-blessing/20'
-    } ${urgent ? 'ring-2 ring-red-400 ring-opacity-50' : ''}`}>
+    }`}>
       <div className="space-y-4">
         {/* Header with Category Badge and Urgent Indicator */}
         <div className="flex items-center justify-between">
@@ -132,6 +153,17 @@ export const PrayerCard = ({
         <p className="text-foreground leading-relaxed font-medium">
           {content}
         </p>
+
+        {/* Image Display */}
+        {image && (
+          <div className="mt-3">
+            <img 
+              src={image} 
+              alt="Prayer/blessing image" 
+              className="w-full max-h-64 object-cover rounded-lg border border-border/50"
+            />
+          </div>
+        )}
 
         {/* On Behalf Of */}
         {onBehalfOf && (
@@ -277,12 +309,17 @@ export const PrayerCard = ({
                 </div>
               </div>
               <div className="mt-3 flex gap-2">
-                <input
-                  type="text"
-                  placeholder="Add a comment..."
-                  className="flex-1 px-3 py-2 text-sm rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
-                />
-                <Button size="sm" variant="outline">Post</Button>
+                <form onSubmit={handleAddComment} className="flex gap-2 w-full">
+                  <input
+                    type="text"
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    onKeyPress={handleCommentKeyPress}
+                    placeholder="Add a comment..."
+                    className="flex-1 px-3 py-2 text-sm rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                  />
+                  <Button type="submit" size="sm" variant="outline">Post</Button>
+                </form>
               </div>
             </div>
           )}

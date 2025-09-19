@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Send, Heart, Sparkles, Forward, X, Check } from "lucide-react";
+import { Send, Heart, Sparkles, Forward, X, Check, ImageIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch";
 
@@ -21,6 +21,7 @@ interface PrayerSubmissionProps {
     scripture?: string;
     forwardEmail?: string;
     forwardPhone?: string;
+    image?: string;
   }) => void;
 }
 
@@ -41,6 +42,7 @@ export const PrayerSubmission = ({ onSubmit }: PrayerSubmissionProps) => {
   const [forwardEmail, setForwardEmail] = useState("");
   const [forwardPhone, setForwardPhone] = useState("");
   const [showForward, setShowForward] = useState(false);
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const { toast } = useToast();
 
   const generateScriptureSuggestion = async (text: string) => {
@@ -82,6 +84,15 @@ export const PrayerSubmission = ({ onSubmit }: PrayerSubmissionProps) => {
       return;
     }
 
+    if (showForward && !forwardEmail.trim() && !forwardPhone.trim()) {
+      toast({
+        title: "Forward contact required",
+        description: "Please provide an email or phone number to forward to someone.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     
     try {
@@ -99,6 +110,7 @@ export const PrayerSubmission = ({ onSubmit }: PrayerSubmissionProps) => {
           scripture: includeScripture ? suggestedScripture : "",
           forwardEmail: forwardEmail.trim(),
           forwardPhone: forwardPhone.trim(),
+          image: uploadedImage || "",
         });
 
         // Reset form
@@ -116,19 +128,40 @@ export const PrayerSubmission = ({ onSubmit }: PrayerSubmissionProps) => {
         setForwardEmail("");
         setForwardPhone("");
         setShowForward(false);
+        setUploadedImage(null);
+        
+        toast({
+          title: type === "prayer" ? "Prayer submitted! 🙏" : "Blessing request shared! ✨",
+          description: "Your heartfelt message has been shared with the community.",
+        });
+      } catch (error) {
+        toast({
+          title: "Something went wrong",
+          description: "Please try again in a moment.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsSubmitting(false);
+      }
+    };
+
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        toast({
+          title: "File too large",
+          description: "Please choose an image smaller than 5MB.",
+          variant: "destructive",
+        });
+        return;
+      }
       
-      toast({
-        title: type === "prayer" ? "Prayer submitted! 🙏" : "Blessing request shared! ✨",
-        description: "Your heartfelt message has been shared with the community.",
-      });
-    } catch (error) {
-      toast({
-        title: "Something went wrong",
-        description: "Please try again in a moment.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setUploadedImage(event.target?.result as string);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -266,6 +299,50 @@ export const PrayerSubmission = ({ onSubmit }: PrayerSubmissionProps) => {
               </div>
             </div>
           )}
+
+        {/* Image Upload */}
+        <div className="space-y-3">
+          <Label className="text-primary-foreground font-medium">
+            Add an image (optional)
+          </Label>
+          <div className="flex flex-col gap-3">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden"
+              id="image-upload"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => document.getElementById('image-upload')?.click()}
+              className="w-full bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/20"
+            >
+              <ImageIcon className="h-4 w-4 mr-2" />
+              Choose Image
+            </Button>
+            
+            {uploadedImage && (
+              <div className="relative">
+                <img 
+                  src={uploadedImage} 
+                  alt="Uploaded" 
+                  className="w-full max-h-48 object-cover rounded-lg border border-primary-foreground/20"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setUploadedImage(null)}
+                  className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
         </div>
 
         {/* Organization Type */}
@@ -315,8 +392,8 @@ export const PrayerSubmission = ({ onSubmit }: PrayerSubmissionProps) => {
         </div>
 
         {/* Options */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="flex items-center justify-between space-x-3">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
             <Label htmlFor="anonymous" className="text-primary-foreground text-sm font-medium">
               Post anonymously
             </Label>
@@ -326,7 +403,7 @@ export const PrayerSubmission = ({ onSubmit }: PrayerSubmissionProps) => {
               onCheckedChange={setAnonymous}
             />
           </div>
-          <div className="flex items-center justify-between space-x-3">
+          <div className="flex items-center justify-between">
             <Label htmlFor="urgent" className="text-primary-foreground text-sm font-medium">
               Mark as urgent
             </Label>
@@ -354,7 +431,7 @@ export const PrayerSubmission = ({ onSubmit }: PrayerSubmissionProps) => {
             <div className="grid grid-cols-2 gap-4 p-4 bg-primary-foreground/10 rounded-lg border border-primary-foreground/20">
               <div className="space-y-2">
                 <Label htmlFor="forwardEmail" className="text-primary-foreground text-sm">
-                  Email (optional)
+                  Email <span className="text-red-400">*</span>
                 </Label>
                 <input
                   id="forwardEmail"
@@ -367,7 +444,7 @@ export const PrayerSubmission = ({ onSubmit }: PrayerSubmissionProps) => {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="forwardPhone" className="text-primary-foreground text-sm">
-                  Phone (optional)
+                  Phone <span className="text-red-400">*</span>
                 </Label>
                 <input
                   id="forwardPhone"
@@ -377,6 +454,9 @@ export const PrayerSubmission = ({ onSubmit }: PrayerSubmissionProps) => {
                   placeholder="+1 (555) 123-4567"
                   className="w-full px-3 py-2 text-sm rounded-md bg-primary-foreground/10 border border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary-foreground/50"
                 />
+              </div>
+              <div className="col-span-2 text-xs text-primary-foreground/70">
+                Provide at least one contact method to forward this message
               </div>
             </div>
           )}
