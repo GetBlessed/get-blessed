@@ -468,13 +468,13 @@ const Index = () => {
 
           <TabsContent value="blessings" className="space-y-6">
             {/* Filter Tabs for Blessings */}
-            <div className="flex justify-center">
-              <div className="inline-flex rounded-lg border border-border/50 p-1 bg-muted/30">
+            <div className="flex justify-center px-4">
+              <div className="inline-flex rounded-lg border border-border/50 p-1 bg-muted/30 w-full sm:w-auto">
                 <Button
                   variant={activeFilter === "all" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setActiveFilter("all")}
-                  className="text-sm"
+                  className="text-xs sm:text-sm px-2 sm:px-4 py-1.5 sm:py-2 flex-1 sm:flex-initial"
                 >
                   All Requests
                 </Button>
@@ -482,7 +482,7 @@ const Index = () => {
                   variant={activeFilter === "individual" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setActiveFilter("individual")}
-                  className="text-sm"
+                  className="text-xs sm:text-sm px-2 sm:px-4 py-1.5 sm:py-2 flex-1 sm:flex-initial"
                 >
                   Individual
                 </Button>
@@ -490,9 +490,10 @@ const Index = () => {
                   variant={activeFilter === "organization" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setActiveFilter("organization")}
-                  className="text-sm"
+                  className="text-xs sm:text-sm px-2 sm:px-4 py-1.5 sm:py-2 flex-1 sm:flex-initial"
                 >
-                  Groups & Organizations
+                  <span className="hidden sm:inline">Groups & Organizations</span>
+                  <span className="sm:hidden">Groups</span>
                 </Button>
               </div>
             </div>
