@@ -127,10 +127,6 @@ export const PrayerCard = ({
   };
 
   const handleShare = async () => {
-    console.log('=== SHARING DEBUG START ===');
-    console.log('Prayer ID:', id);
-    console.log('Image present:', !!image);
-    
     // Create complete prayer data including image
     const prayerData = {
       id,
@@ -147,39 +143,8 @@ export const PrayerCard = ({
       image
     };
     
-    // Always store complete prayer in localStorage for sharing (with image)
-    try {
-      const storedPrayers = JSON.parse(localStorage.getItem('getblessed_prayers') || '[]');
-      const existingIndex = storedPrayers.findIndex((p: any) => p.id === id);
-      
-      if (existingIndex >= 0) {
-        storedPrayers[existingIndex] = { ...prayerData, createdAt: new Date().toISOString() };
-      } else {
-        storedPrayers.unshift({ ...prayerData, createdAt: new Date().toISOString() });
-      }
-      
-      localStorage.setItem('getblessed_prayers', JSON.stringify(storedPrayers));
-      console.log('Prayer stored for sharing with image:', !!prayerData.image);
-    } catch (error) {
-      console.error('Error storing prayer for sharing:', error);
-    }
-    
-    // Create share URL with fallback data (smaller, without image)
-    let shareUrl: string;
-    try {
-      const fallbackData = { ...prayerData };
-      delete fallbackData.image; // Remove image to keep URL shorter
-      const encodedData = btoa(JSON.stringify(fallbackData));
-      shareUrl = `${window.location.origin}/${type}/${id}?data=${encodedData}`;
-      console.log('Share URL created with fallback data');
-    } catch (error) {
-      console.error('Error creating share URL:', error);
-      shareUrl = `${window.location.origin}/${type}/${id}`;
-    }
-    
     // Simple, reliable clipboard copy
     const copyToClipboard = async (text: string) => {
-      // Method 1: Modern clipboard API (if available and secure)
       if (navigator.clipboard && window.isSecureContext) {
         try {
           await navigator.clipboard.writeText(text);
@@ -189,7 +154,6 @@ export const PrayerCard = ({
         }
       }
       
-      // Method 2: Selection + execCommand (most reliable)
       try {
         const textarea = document.createElement('textarea');
         textarea.value = text;
@@ -210,25 +174,35 @@ export const PrayerCard = ({
         return false;
       }
     };
-    
-    // Try to copy
-    const success = await copyToClipboard(`Sharing a ${type} with you: ${shareUrl}`);
-    
-    if (success) {
+
+    try {
+      // Try to include image in URL
+      const encodedData = btoa(JSON.stringify(prayerData));
+      const shareUrl = `${window.location.origin}/${type}/${id}?data=${encodedData}`;
+      
+      // Try to copy regardless of URL length
+      const success = await copyToClipboard(`Sharing a ${type} with you: ${shareUrl}`);
+      
+      if (success) {
+        toast({
+          title: "Link copied! 🔗",
+          description: image ? "Share this with others (includes image)." : "Share this with others to spread the love.",
+        });
+      } else {
+        toast({
+          title: "Copy this link manually:",
+          description: shareUrl.length > 50 ? shareUrl.substring(0, 50) + "..." : shareUrl,
+          duration: 10000,
+        });
+      }
+    } catch (error) {
+      console.error('Error creating share URL:', error);
       toast({
-        title: "Link copied! 🔗",
-        description: "Share this with others to spread the love.",
-      });
-    } else {
-      // Final fallback - show the URL
-      toast({
-        title: "Copy this link manually:",
-        description: shareUrl.length > 50 ? shareUrl.substring(0, 50) + "..." : shareUrl,
-        duration: 10000,
+        title: "Error creating share link",
+        description: "Please try again.",
+        variant: "destructive",
       });
     }
-    
-    console.log('=== SHARING DEBUG END ===');
   };
 
   const getInitials = (name: string) => {
