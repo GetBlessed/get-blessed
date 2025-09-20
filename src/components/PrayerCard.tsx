@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Heart, MessageCircle, Users, Send, Gift, AlertCircle } from "lucide-react";
+import { Heart, MessageCircle, Users, Send, Gift, AlertCircle, Share2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -21,6 +21,7 @@ interface PrayerCardProps {
 }
 
 export const PrayerCard = ({ 
+  id,
   content, 
   type, 
   author, 
@@ -122,6 +123,31 @@ export const PrayerCard = ({
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleAddComment(e);
+    }
+  };
+
+  const handleShare = async () => {
+    const shareUrl = `${window.location.origin}/${type}/${id}`;
+    
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast({
+        title: "Link copied! 🔗",
+        description: "Share this with others to spread the love.",
+      });
+    } catch (err) {
+      // Fallback for browsers that don't support clipboard API
+      const textArea = document.createElement('textarea');
+      textArea.value = shareUrl;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      
+      toast({
+        title: "Link copied! 🔗",
+        description: "Share this with others to spread the love.",
+      });
     }
   };
 
@@ -259,15 +285,25 @@ export const PrayerCard = ({
           </div>
 
           {/* Additional Actions */}
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center justify-between gap-2">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setShowComments(!showComments)}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl hover:text-primary hover:bg-primary/5 hover:shadow-sm transition-all"
+              className="flex items-center gap-2 px-3 py-2.5 rounded-xl hover:text-primary hover:bg-primary/5 hover:shadow-sm transition-all"
             >
               <MessageCircle className="h-4 w-4" />
               <span className="text-xs font-medium">Comment</span>
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleShare}
+              className="flex items-center gap-2 px-3 py-2.5 rounded-xl hover:text-purple-600 hover:bg-purple-50 hover:shadow-sm transition-all"
+            >
+              <Share2 className="h-4 w-4" />
+              <span className="text-xs font-medium">Share</span>
             </Button>
             
             <div className="relative">
