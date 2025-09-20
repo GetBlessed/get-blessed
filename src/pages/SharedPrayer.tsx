@@ -177,46 +177,12 @@ export default function SharedPrayer() {
     console.log('Trying storage first for complete data...');
     const storedPrayer = getStoredPrayer(id);
     if (storedPrayer) {
-      console.log('Found complete prayer in storage:', storedPrayer);
+      console.log('Found complete prayer in storage with image:', !!storedPrayer.image);
       setPrayer(storedPrayer);
       return;
     }
     
-    // If not in storage, check if prayer data is encoded in URL parameters
-    const urlParams = new URLSearchParams(location.search);
-    const encodedData = urlParams.get('data');
-    
-    console.log('Encoded data from URL:', encodedData ? `${encodedData.length} chars` : 'None');
-    
-    if (encodedData) {
-      try {
-        console.log('Attempting to decode URL data...');
-        const decodedString = atob(encodedData);
-        console.log('Decoded string length:', decodedString.length);
-        console.log('Decoded string preview:', decodedString.substring(0, 100));
-        
-        const decodedData = JSON.parse(decodedString);
-        console.log('Successfully parsed prayer data from URL:');
-        console.log('- Has image:', !!decodedData.image);
-        console.log('- Image length:', decodedData.image?.length || 0);
-        console.log('- Content preview:', decodedData.content?.substring(0, 50));
-        
-        // Convert to StoredPrayer format
-        const urlPrayer: StoredPrayer = {
-          ...decodedData,
-          createdAt: new Date().toISOString() // Default createdAt
-        };
-        
-        console.log('Using URL prayer data (may lack image)');
-        setPrayer(urlPrayer);
-        return;
-      } catch (error) {
-        console.error('Error decoding URL prayer data:', error);
-        console.error('Encoded data that failed:', encodedData);
-      }
-    }
-    
-    console.log('No valid storage or URL data, trying mock data...');
+    console.log('No storage data, trying mock data...');
     
     // Fall back to mock data
     const mockPrayer = mockPrayers[id as keyof typeof mockPrayers];
@@ -224,7 +190,7 @@ export default function SharedPrayer() {
       console.log('Found prayer in mock data:', mockPrayer);
       setPrayer(mockPrayer);
     } else {
-      console.log('Prayer not found anywhere - ID not in storage, URL, or mock data');
+      console.log('Prayer not found anywhere - ID not in storage or mock data');
       
       // Debug storage contents
       debugStorageContents();

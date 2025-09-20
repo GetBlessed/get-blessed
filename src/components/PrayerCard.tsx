@@ -130,9 +130,8 @@ export const PrayerCard = ({
     console.log('=== SHARING DEBUG START ===');
     console.log('Prayer ID:', id);
     console.log('Image present:', !!image);
-    console.log('Image length:', image?.length || 0);
     
-    // Create complete prayer data including image
+    // Always store the complete prayer in localStorage for sharing
     const prayerData = {
       id,
       content,
@@ -145,48 +144,32 @@ export const PrayerCard = ({
       urgent,
       onBehalfOf: onBehalfOf || "",
       organizationType,
-      image
+      image,
+      createdAt: new Date().toISOString()
     };
     
-    console.log('Prayer data created:', {
-      ...prayerData,
-      image: prayerData.image ? `${prayerData.image.substring(0, 50)}...` : 'none'
-    });
-    
-    // Try to create URL with image first
-    let shareUrl: string;
-    let includesImage = true;
-    
+    // Store in localStorage so shared links can access complete data
     try {
-      const encodedData = btoa(JSON.stringify(prayerData));
-      console.log('Encoded data length:', encodedData.length);
+      const storedPrayers = JSON.parse(localStorage.getItem('getblessed_prayers') || '[]');
+      const existingIndex = storedPrayers.findIndex((p: any) => p.id === id);
       
-      const testUrl = `${window.location.origin}/${type}/${id}?data=${encodedData}`;
-      console.log('Test URL length:', testUrl.length);
-      
-      // Check if URL is too long (typical browser limit is ~2000 chars)
-      if (testUrl.length > 1800) {
-        console.log('URL too long with image, creating without image');
-        // Create version without image
-        const prayerDataNoImage = { ...prayerData };
-        delete prayerDataNoImage.image;
-        const encodedDataNoImage = btoa(JSON.stringify(prayerDataNoImage));
-        shareUrl = `${window.location.origin}/${type}/${id}?data=${encodedDataNoImage}`;
-        includesImage = false;
-        console.log('Final URL (no image):', shareUrl);
+      if (existingIndex >= 0) {
+        // Update existing prayer
+        storedPrayers[existingIndex] = prayerData;
       } else {
-        shareUrl = testUrl;
-        console.log('Final URL (with image):', shareUrl);
+        // Add new prayer
+        storedPrayers.unshift(prayerData);
       }
+      
+      localStorage.setItem('getblessed_prayers', JSON.stringify(storedPrayers));
+      console.log('Prayer stored for sharing with image:', !!prayerData.image);
     } catch (error) {
-      console.error('Error creating share URL:', error);
-      // Fallback to simple URL without data
-      shareUrl = `${window.location.origin}/${type}/${id}`;
-      includesImage = false;
-      console.log('Fallback URL:', shareUrl);
+      console.error('Error storing prayer for sharing:', error);
     }
     
-    console.log('Includes image in URL:', includesImage);
+    // Create simple share URL (no data encoding needed)
+    const shareUrl = `${window.location.origin}/${type}/${id}`;
+    console.log('Share URL created:', shareUrl);
     console.log('=== SHARING DEBUG END ===');
     
     // Simple, reliable clipboard copy
@@ -229,9 +212,7 @@ export const PrayerCard = ({
     if (success) {
       toast({
         title: "Link copied! 🔗",
-        description: includesImage 
-          ? "Share this with others to spread the love." 
-          : "Link copied (image too large for sharing URL).",
+        description: "Share this with others to spread the love.",
       });
     } else {
       // Final fallback - show the URL
