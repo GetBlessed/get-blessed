@@ -191,7 +191,8 @@ export default function SharedPrayer() {
     if (encodedData) {
       try {
         console.log('Attempting to decode URL data...');
-        const decodedString = atob(encodedData);
+        // Use proper decoding for better emoji/special character handling
+        const decodedString = decodeURIComponent(escape(atob(decodeURIComponent(encodedData))));
         console.log('Decoded string length:', decodedString.length);
         console.log('Decoded string preview:', decodedString.substring(0, 100));
         
@@ -207,12 +208,28 @@ export default function SharedPrayer() {
           createdAt: new Date().toISOString() // Default createdAt
         };
         
-        console.log('Using URL prayer data (may lack image)');
+        console.log('Using URL prayer data with proper encoding');
         setPrayer(urlPrayer);
         return;
       } catch (error) {
         console.error('Error decoding URL prayer data:', error);
-        console.error('Encoded data that failed:', encodedData);
+        console.error('Encoded data that failed:', encodedData?.substring(0, 100));
+        
+        // Try fallback decoding method
+        try {
+          console.log('Trying fallback decoding method...');
+          const fallbackDecoded = atob(encodedData);
+          const fallbackData = JSON.parse(fallbackDecoded);
+          const urlPrayer: StoredPrayer = {
+            ...fallbackData,
+            createdAt: new Date().toISOString()
+          };
+          console.log('Fallback decoding successful');
+          setPrayer(urlPrayer);
+          return;
+        } catch (fallbackError) {
+          console.error('Fallback decoding also failed:', fallbackError);
+        }
       }
     }
     

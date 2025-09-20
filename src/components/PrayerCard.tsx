@@ -158,32 +158,49 @@ export const PrayerCard = ({
     let includesImage = true;
     
     try {
-      const encodedData = btoa(JSON.stringify(prayerData));
-      console.log('Encoded data length:', encodedData.length);
+      // Use proper JSON stringification and URL encoding for better emoji/special character handling
+      const jsonString = JSON.stringify(prayerData);
+      console.log('JSON string length:', jsonString.length);
       
-      const testUrl = `${window.location.origin}/${type}/${id}?data=${encodedData}`;
-      console.log('Test URL length:', testUrl.length);
-      
-      // Check if URL is too long (typical browser limit is ~2000 chars)
-      if (testUrl.length > 1800) {
-        console.log('URL too long with image, creating without image');
-        // Create version without image
-        const prayerDataNoImage = { ...prayerData };
-        delete prayerDataNoImage.image;
-        const encodedDataNoImage = btoa(JSON.stringify(prayerDataNoImage));
-        shareUrl = `${window.location.origin}/${type}/${id}?data=${encodedDataNoImage}`;
-        includesImage = false;
-        console.log('Final URL (no image):', shareUrl);
+      // Try with image first if it's not too large
+      if (jsonString.length < 3000) { // Conservative limit for JSON before encoding
+        try {
+          const encodedData = btoa(unescape(encodeURIComponent(jsonString)));
+          const testUrl = `${window.location.origin}/${type}/${id}?data=${encodeURIComponent(encodedData)}`;
+          console.log('Test URL length with image:', testUrl.length);
+          
+          // More conservative URL length limit
+          if (testUrl.length <= 1200) {
+            shareUrl = testUrl;
+            console.log('Final URL (with image):', shareUrl.substring(0, 100) + '...');
+          } else {
+            throw new Error('URL too long with image');
+          }
+        } catch (e) {
+          console.log('Failed to encode with image, trying without:', e);
+          throw new Error('Image encoding failed');
+        }
       } else {
-        shareUrl = testUrl;
-        console.log('Final URL (with image):', shareUrl);
+        throw new Error('JSON too large with image');
       }
     } catch (error) {
-      console.error('Error creating share URL:', error);
-      // Fallback to simple URL without data
-      shareUrl = `${window.location.origin}/${type}/${id}`;
-      includesImage = false;
-      console.log('Fallback URL:', shareUrl);
+      console.log('Creating URL without image due to:', error);
+      // Create version without image
+      const prayerDataNoImage = { ...prayerData };
+      delete prayerDataNoImage.image;
+      
+      try {
+        const jsonStringNoImage = JSON.stringify(prayerDataNoImage);
+        const encodedDataNoImage = btoa(unescape(encodeURIComponent(jsonStringNoImage)));
+        shareUrl = `${window.location.origin}/${type}/${id}?data=${encodeURIComponent(encodedDataNoImage)}`;
+        includesImage = false;
+        console.log('Final URL (no image):', shareUrl.substring(0, 100) + '...');
+      } catch (e) {
+        console.error('Failed to create URL even without image:', e);
+        // Fallback to simple URL without data
+        shareUrl = `${window.location.origin}/${type}/${id}`;
+        includesImage = false;
+      }
     }
     
     console.log('Includes image in URL:', includesImage);
