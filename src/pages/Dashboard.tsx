@@ -638,32 +638,35 @@ const Dashboard = ({ user, onNavigateToHome, onLogout }: DashboardProps) => {
 
       {/* Header with gradient background matching reference */}
       <div 
-        className="text-white px-4 sm:px-6 py-6 sm:py-8 relative overflow-hidden"
+        className="text-white px-2 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8 relative overflow-hidden"
         style={{
           background: 'linear-gradient(135deg, #8B5CF6 0%, #A855F7 50%, #C084FC 100%)'
         }}
       >
         <div className="max-w-6xl mx-auto relative z-10">
-          <div className="flex flex-col sm:flex-row items-center sm:items-center sm:justify-between gap-4 sm:gap-0">
-            <div className="flex items-center gap-3 sm:gap-4 text-center sm:text-left">
-              <Avatar className="w-12 h-12 sm:w-16 sm:h-16 border-2 border-white/30">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+            <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 min-w-0 flex-1">
+              <Avatar className="w-10 h-10 sm:w-12 sm:h-12 lg:w-16 lg:h-16 border-2 border-white/30 flex-shrink-0">
                 <AvatarImage src={profilePicture || userProfile.profilePicture || ""} alt={userData.name} />
-                <AvatarFallback className="text-sm sm:text-lg bg-white/20 text-white backdrop-blur-sm">
+                <AvatarFallback className="text-xs sm:text-sm lg:text-lg bg-white/20 text-white backdrop-blur-sm">
                   {userData.name.split(' ').map(n => n[0]).join('').toUpperCase()}
                 </AvatarFallback>
               </Avatar>
-              <div className="min-w-0">
-                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-1 break-words">Welcome back, {userData.name}</h1>
-                <p className="text-white/80 text-sm sm:text-base lg:text-lg break-words">{userData.title}</p>
+              <div className="min-w-0 flex-1">
+                <h1 className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold mb-0.5 sm:mb-1 break-words leading-tight">
+                  Welcome back, {userData.name}
+                </h1>
+                <p className="text-white/80 text-xs sm:text-sm lg:text-base xl:text-lg break-words">{userData.title}</p>
               </div>
             </div>
             <Button 
               onClick={handleGivePrayer}
-              className="bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm rounded-xl px-3 sm:px-6 py-2 sm:py-3 font-medium text-sm sm:text-base w-full sm:w-auto"
+              className="bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm rounded-xl px-2 sm:px-3 lg:px-6 py-1.5 sm:py-2 lg:py-3 font-medium text-xs sm:text-sm lg:text-base w-full sm:w-auto flex-shrink-0"
             >
-              <Plus className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Give Prayer or Blessing</span>
-              <span className="sm:hidden">Give Prayer</span>
+              <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline lg:hidden">Give Prayer</span>
+              <span className="sm:hidden lg:inline">Give Prayer or Blessing</span>
+              <span className="lg:hidden sm:inline">Prayer</span>
             </Button>
           </div>
         </div>

@@ -492,8 +492,8 @@ const Index = () => {
                   onClick={() => setActiveFilter("organization")}
                   className="text-xs sm:text-sm px-2 sm:px-4 py-1.5 sm:py-2 flex-1 sm:flex-initial"
                 >
-                  <span className="hidden sm:inline">Groups & Organizations</span>
-                  <span className="sm:hidden">Groups</span>
+                  <span className="hidden sm:inline">Organizations</span>
+                  <span className="sm:hidden">Organizations</span>
                 </Button>
               </div>
             </div>
