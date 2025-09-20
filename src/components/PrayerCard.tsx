@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Heart, MessageCircle, Users, Send, Gift, AlertCircle, Share2, Trash2 } from "lucide-react";
+import { Heart, MessageCircle, Users, Send, Gift, AlertCircle, Share2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -18,8 +18,6 @@ interface PrayerCardProps {
   onBehalfOf?: string;
   organizationType?: "individual" | "organization";
   image?: string;
-  currentUser?: string | null; // Current user's name for delete functionality
-  onDelete?: (id: string) => void; // Callback for deletion
 }
 
 export const PrayerCard = ({ 
@@ -34,9 +32,7 @@ export const PrayerCard = ({
   urgent = false,
   onBehalfOf,
   organizationType = "individual",
-  image,
-  currentUser,
-  onDelete
+  image
 }: PrayerCardProps) => {
   const [supportCount, setSupportCount] = useState(initialSupportCount);
   const [prayingCount, setPrayingCount] = useState(Math.floor(Math.random() * 15) + 5);
@@ -130,16 +126,6 @@ export const PrayerCard = ({
     }
   };
 
-  const handleDelete = () => {
-    if (onDelete) {
-      onDelete(id);
-      toast({
-        title: `${type === 'prayer' ? 'Prayer' : 'Blessing'} deleted`,
-        description: "Your post has been removed from the community feed.",
-      });
-    }
-  };
-
   const handleShare = async () => {
     console.log('=== SHARING DEBUG START ===');
     console.log('Prayer ID:', id);
@@ -172,52 +158,32 @@ export const PrayerCard = ({
     let includesImage = true;
     
     try {
-      // Use proper JSON stringification and URL encoding for better emoji/special character handling
-      const jsonString = JSON.stringify(prayerData);
-      console.log('JSON string length:', jsonString.length);
+      const encodedData = btoa(JSON.stringify(prayerData));
+      console.log('Encoded data length:', encodedData.length);
       
-      // Try with image first if it's not too large
-      if (jsonString.length <= 2000) { // Conservative limit for JSON with image
-        try {
-          // Simple base64 encoding that works reliably with emojis
-          const encodedData = btoa(jsonString);
-          console.log('Base64 encoded length:', encodedData.length);
-          
-          const testUrl = `${window.location.origin}/${type}/${id}?data=${encodedData}`;
-          console.log('Test URL length with image:', testUrl.length);
-          
-          // Conservative URL length limit
-          if (testUrl.length <= 1500) {
-            shareUrl = testUrl;
-            console.log('Final URL (with image):', shareUrl.substring(0, 100) + '...');
-          } else {
-            throw new Error('URL too long with image');
-          }
-        } catch (e) {
-          console.log('Failed to encode with image, trying without:', e);
-          throw new Error('Image encoding failed');
-        }
-      } else {
-        throw new Error('JSON too large with image');
-      }
-    } catch (error) {
-      console.log('Creating URL without image due to:', error);
-      // Create version without image
-      const prayerDataNoImage = { ...prayerData };
-      delete prayerDataNoImage.image;
+      const testUrl = `${window.location.origin}/${type}/${id}?data=${encodedData}`;
+      console.log('Test URL length:', testUrl.length);
       
-      try {
-        const jsonStringNoImage = JSON.stringify(prayerDataNoImage);
-        const encodedDataNoImage = btoa(jsonStringNoImage);
+      // Check if URL is too long (typical browser limit is ~2000 chars)
+      if (testUrl.length > 1800) {
+        console.log('URL too long with image, creating without image');
+        // Create version without image
+        const prayerDataNoImage = { ...prayerData };
+        delete prayerDataNoImage.image;
+        const encodedDataNoImage = btoa(JSON.stringify(prayerDataNoImage));
         shareUrl = `${window.location.origin}/${type}/${id}?data=${encodedDataNoImage}`;
         includesImage = false;
-        console.log('Final URL (no image):', shareUrl.substring(0, 100) + '...');
-      } catch (e) {
-        console.error('Failed to create URL even without image:', e);
-        // Fallback to simple URL without data
-        shareUrl = `${window.location.origin}/${type}/${id}`;
-        includesImage = false;
+        console.log('Final URL (no image):', shareUrl);
+      } else {
+        shareUrl = testUrl;
+        console.log('Final URL (with image):', shareUrl);
       }
+    } catch (error) {
+      console.error('Error creating share URL:', error);
+      // Fallback to simple URL without data
+      shareUrl = `${window.location.origin}/${type}/${id}`;
+      includesImage = false;
+      console.log('Fallback URL:', shareUrl);
     }
     
     console.log('Includes image in URL:', includesImage);
@@ -372,17 +338,6 @@ export const PrayerCard = ({
               <span className="ml-2">{timeAgo}</span>
             </div>
           </div>
-          {/* Delete button - only show if user can delete this prayer */}
-          {currentUser && !anonymous && (author === currentUser || timeAgo === "Just now") && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleDelete}
-              className="flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg hover:text-red-600 hover:bg-red-50 transition-all text-xs"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          )}
         </div>
         
         {/* Enhanced Support Actions */}

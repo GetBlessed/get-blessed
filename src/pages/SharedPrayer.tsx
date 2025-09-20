@@ -5,7 +5,7 @@ import { Heart, MessageCircle, Users, Send, Gift, AlertCircle, ArrowLeft } from 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { WaitlistModal } from "@/components/WaitlistModal";
+import { AuthModal } from "@/components/AuthModal";
 import { Link } from "react-router-dom";
 import { getStoredPrayer, type StoredPrayer } from "@/utils/prayerStorage";
 import { debugStorageContents } from "@/utils/debugStorage";
@@ -158,7 +158,7 @@ export default function SharedPrayer() {
   const { id } = useParams();
   const location = useLocation();
   const { toast } = useToast();
-  const [showWaitlistModal, setShowWaitlistModal] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [prayer, setPrayer] = useState<StoredPrayer | null>(null);
   
   // Extract type from pathname
@@ -191,22 +191,11 @@ export default function SharedPrayer() {
     if (encodedData) {
       try {
         console.log('Attempting to decode URL data...');
-        let decodedData;
+        const decodedString = atob(encodedData);
+        console.log('Decoded string length:', decodedString.length);
+        console.log('Decoded string preview:', decodedString.substring(0, 100));
         
-        // Try simple base64 decoding first
-        try {
-          const jsonString = atob(encodedData);
-          decodedData = JSON.parse(jsonString);
-          console.log('Successfully decoded with simple base64');
-        } catch (error) {
-          console.log('Simple decoding failed, trying URL-decoded base64...');
-          // Try decoding URL-encoded base64
-          const decodedBase64 = decodeURIComponent(encodedData);
-          const jsonString = atob(decodedBase64);
-          decodedData = JSON.parse(jsonString);
-          console.log('Successfully decoded with URL-decoded base64');
-        }
-        
+        const decodedData = JSON.parse(decodedString);
         console.log('Successfully parsed prayer data from URL:');
         console.log('- Has image:', !!decodedData.image);
         console.log('- Image length:', decodedData.image?.length || 0);
@@ -218,12 +207,12 @@ export default function SharedPrayer() {
           createdAt: new Date().toISOString() // Default createdAt
         };
         
-        console.log('Using URL prayer data');
+        console.log('Using URL prayer data (may lack image)');
         setPrayer(urlPrayer);
         return;
       } catch (error) {
         console.error('Error decoding URL prayer data:', error);
-        console.error('Encoded data that failed:', encodedData?.substring(0, 100));
+        console.error('Encoded data that failed:', encodedData);
       }
     }
     
@@ -287,7 +276,7 @@ export default function SharedPrayer() {
   }
 
   const handleInteraction = () => {
-    setShowWaitlistModal(true);
+    setShowAuthModal(true);
   };
 
   const getInitials = (name: string) => {
@@ -462,7 +451,7 @@ export default function SharedPrayer() {
               <p className="text-sm text-muted-foreground">
                 Share your prayers, offer blessings, and connect with a supportive community.
               </p>
-              <Button onClick={() => setShowWaitlistModal(true)} className="w-full">
+              <Button onClick={() => setShowAuthModal(true)} className="w-full">
                 Join Community
               </Button>
             </div>
@@ -470,10 +459,11 @@ export default function SharedPrayer() {
         </Card>
       </div>
 
-      {/* Waitlist Modal */}
-      <WaitlistModal 
-        isOpen={showWaitlistModal} 
-        onClose={() => setShowWaitlistModal(false)}
+      {/* Auth Modal */}
+      <AuthModal 
+        isOpen={showAuthModal} 
+        onClose={() => setShowAuthModal(false)}
+        onLogin={() => setShowAuthModal(false)}
       />
     </div>
   );
