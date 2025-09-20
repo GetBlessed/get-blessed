@@ -12,27 +12,131 @@ import { Link } from "react-router-dom";
 const mockPrayers = {
   "1": {
     id: "1",
-    content: "Praying for healing and strength during this difficult time. Your love and support mean everything to me.",
+    content: "Going through a difficult time with my health. Would appreciate prayers for strength and healing during my treatment journey.",
     type: "prayer" as const,
     author: "Sarah M.",
     supportCount: 24,
     timeAgo: "2 hours ago",
     category: "Health",
     anonymous: false,
-    urgent: false,
+    urgent: true,
     organizationType: "individual" as const,
   },
   "2": {
     id: "2",
-    content: "Grateful for this beautiful day and all the blessings in my life. Sending love to everyone reading this!",
+    content: "Grateful for the wonderful news about my sister's recovery. Sending blessings to everyone who supported us during this time.",
     type: "blessing" as const,
     author: "Michael K.",
     supportCount: 18,
-    timeAgo: "1 hour ago",
+    timeAgo: "4 hours ago",
     category: "Gratitude",
     anonymous: false,
     urgent: false,
+    onBehalfOf: "My sister",
     organizationType: "individual" as const,
+  },
+  "3": {
+    id: "3",
+    content: "Starting a new job next week and feeling nervous. Prayers for confidence and wisdom would mean the world to me.",
+    type: "prayer" as const,
+    author: "David L.",
+    supportCount: 31,
+    timeAgo: "6 hours ago",
+    category: "Work",
+    anonymous: false,
+    urgent: false,
+    organizationType: "individual" as const,
+  },
+  "4": {
+    id: "4",
+    content: "Blessing everyone who's struggling today. Remember that you are loved, valued, and stronger than you know. Peace be with you all.",
+    type: "blessing" as const,
+    author: "Hope Community Church",
+    supportCount: 42,
+    timeAgo: "8 hours ago",
+    category: "General",
+    anonymous: false,
+    urgent: false,
+    onBehalfOf: "Our community",
+    organizationType: "organization" as const,
+  },
+  "5": {
+    id: "5",
+    content: "My family is going through a tough financial situation. Prayers for guidance and opportunities would be deeply appreciated.",
+    type: "prayer" as const,
+    author: "Anonymous",
+    supportCount: 19,
+    timeAgo: "12 hours ago",
+    category: "Family",
+    anonymous: true,
+    urgent: false,
+    onBehalfOf: "My family",
+    organizationType: "individual" as const,
+  },
+  "6": {
+    id: "6",
+    content: "Our food bank is organizing a community drive this weekend. Praying for generous hearts and abundant donations to help feed families in need during these challenging times.",
+    type: "prayer" as const,
+    author: "Community Food Bank",
+    supportCount: 67,
+    timeAgo: "1 day ago",
+    category: "General",
+    anonymous: false,
+    urgent: false,
+    onBehalfOf: "Families in need",
+    organizationType: "organization" as const,
+  },
+  "7": {
+    id: "7",
+    content: "We are overwhelmed with gratitude! Thanks to our amazing community, we collected over 2,000 pounds of food and raised $15,000 for local families. Your generosity is a true blessing.",
+    type: "blessing" as const,
+    author: "Helping Hands Nonprofit",
+    supportCount: 89,
+    timeAgo: "2 days ago",
+    category: "Gratitude",
+    anonymous: false,
+    urgent: false,
+    onBehalfOf: "Community donors",
+    organizationType: "organization" as const,
+  },
+  "8": {
+    id: "8",
+    content: "May all who are seeking healing find comfort and strength today. May your journey be filled with hope, love, and the support of those around you. Blessings to each precious soul.",
+    type: "blessing" as const,
+    author: "St. Mary's Interfaith Center",
+    supportCount: 156,
+    timeAgo: "3 days ago",
+    category: "Health",
+    anonymous: false,
+    urgent: false,
+    onBehalfOf: "All seeking healing",
+    organizationType: "organization" as const,
+  },
+  "9": {
+    id: "9",
+    content: "Our local community was affected by recent flooding. We're seeking prayers for recovery, rebuilding, and hope for everyone impacted.",
+    type: "prayer" as const,
+    author: "Peace Unity Church",
+    supportCount: 156,
+    timeAgo: "5 hours ago",
+    category: "General",
+    anonymous: false,
+    urgent: false,
+    onBehalfOf: "Our community",
+    organizationType: "organization" as const,
+  },
+  "10": {
+    id: "10",
+    content: "Join us in praying for peace, understanding, and harmony across all nations and communities worldwide.",
+    type: "prayer" as const,
+    author: "Global Peace Initiative",
+    supportCount: 312,
+    timeAgo: "12 hours ago",
+    category: "General",
+    anonymous: false,
+    urgent: false,
+    onBehalfOf: "All nations",
+    organizationType: "organization" as const,
   }
 };
 
@@ -72,15 +176,16 @@ export default function SharedPrayer() {
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50">
-        <div className="max-w-2xl mx-auto px-4 py-4">
-          <div className="flex items-center gap-4">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <Link to="/">
-              <Button variant="ghost" size="sm" className="flex items-center gap-2">
-                <ArrowLeft className="w-4 h-4" />
-                Back to Community
+              <Button variant="ghost" size="sm" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+                <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Back to Community</span>
+                <span className="sm:hidden">Back</span>
               </Button>
             </Link>
-            <div className="text-sm text-muted-foreground">
+            <div className="text-xs sm:text-sm text-muted-foreground">
               Shared {prayer.type}
             </div>
           </div>

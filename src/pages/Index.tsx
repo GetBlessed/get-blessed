@@ -249,15 +249,16 @@ const Index = () => {
   const renderMainNavigation = () => (
     <div className="bg-card border-b border-border/30 px-4 py-2">
       <div className="max-w-6xl mx-auto flex items-center justify-center">
-        <div className="flex items-center gap-1 bg-muted/30 p-1.5 rounded-2xl">
+        <div className="flex items-center gap-1 bg-muted/30 p-1 sm:p-1.5 rounded-2xl w-full sm:w-auto">
           <Button
             variant={currentView === "home" ? "default" : "ghost"}
             size="sm"
             onClick={() => setCurrentView("home")}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl font-medium"
+            className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-xl font-medium text-xs sm:text-sm flex-1 sm:flex-initial"
           >
-            <Users className="h-4 w-4" />
-            Community
+            <Users className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Community</span>
+            <span className="sm:hidden">Feed</span>
           </Button>
           <Button
             variant={currentView === "my-prayers" ? "default" : "ghost"}
@@ -267,19 +268,21 @@ const Index = () => {
                 setCurrentView("my-prayers");
               }
             }}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl font-medium"
+            className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-xl font-medium text-xs sm:text-sm flex-1 sm:flex-initial"
           >
-            <Heart className="h-4 w-4" />
-            My Dashboard
+            <Heart className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">My Dashboard</span>
+            <span className="sm:hidden">Dashboard</span>
           </Button>
           <Button
             variant={currentView === "gifts" ? "default" : "ghost"}
             size="sm"
             onClick={() => setCurrentView("gifts")}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl font-medium"
+            className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-xl font-medium text-xs sm:text-sm flex-1 sm:flex-initial"
           >
-            <Gift className="h-4 w-4" />
-            Gifts
+            <Gift className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Gifts</span>
+            <span className="sm:hidden">Gifts</span>
           </Button>
         </div>
       </div>
@@ -361,62 +364,62 @@ const Index = () => {
       {renderMainNavigation()}
 
       {/* Hero Header */}
-      <header className="bg-gradient-hero text-primary-foreground py-12 px-4">
-        <div className="max-w-4xl mx-auto text-center space-y-6">
-          <h1 className="text-5xl font-serif font-semibold tracking-tight">
+      <header className="bg-gradient-hero text-primary-foreground py-8 sm:py-12 px-4">
+        <div className="max-w-4xl mx-auto text-center space-y-4 sm:space-y-6">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-semibold tracking-tight">
             Welcome to GetBlessed
           </h1>
-          <p className="text-xl opacity-90 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg lg:text-xl opacity-90 max-w-2xl mx-auto leading-relaxed px-4">
             A community where hearts connect through prayer and blessing. 
             Submit prayers to lift others up, ask for blessings when you need support.
           </p>
           
           {/* Stats */}
-          <div className="flex justify-center gap-8 pt-6">
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-8 pt-4 sm:pt-6">
             <div className="text-center">
-              <div className="text-2xl font-bold">🙏 {stats.totalPrayers.toLocaleString()}</div>
-              <div className="text-sm opacity-80">Prayers Shared</div>
+              <div className="text-xl sm:text-2xl font-bold">🙏 {stats.totalPrayers.toLocaleString()}</div>
+              <div className="text-xs sm:text-sm opacity-80">Prayers Shared</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold">✨ {stats.totalBlessings.toLocaleString()}</div>
-              <div className="text-sm opacity-80">Blessings Given</div>
+              <div className="text-xl sm:text-2xl font-bold">✨ {stats.totalBlessings.toLocaleString()}</div>
+              <div className="text-xs sm:text-sm opacity-80">Blessings Given</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold">🤝 {stats.activeCommunity.toLocaleString()}</div>
-              <div className="text-sm opacity-80">Community Members</div>
+              <div className="text-xl sm:text-2xl font-bold">🤝 {stats.activeCommunity.toLocaleString()}</div>
+              <div className="text-xs sm:text-sm opacity-80">Community Members</div>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-8">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Share Button */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6 sm:mb-8">
           <Button
             onClick={() => setShowSubmission(!showSubmission)}
             size="lg"
-            className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-8 py-3 shadow-medium transition-all hover:shadow-elevated"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-6 sm:px-8 py-2.5 sm:py-3 shadow-medium transition-all hover:shadow-elevated w-full sm:w-auto"
           >
-            <Plus className="h-5 w-5 mr-2" />
+            <Plus className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
             {showSubmission ? "Close" : "Share Your Heart"}
           </Button>
         </div>
 
         {/* Prayer Submission Form */}
         {showSubmission && (
-          <div className="mb-8">
+          <div className="mb-6 sm:mb-8 animate-fade-in">
             <PrayerSubmission onSubmit={handleNewPrayer} />
           </div>
         )}
 
         {/* Community Feed with Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <div className="text-center mb-6">
-            <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 bg-muted">
-              <TabsTrigger value="prayers" className="text-sm font-medium">
+          <div className="text-center mb-4 sm:mb-6">
+            <TabsList className="grid w-full max-w-sm sm:max-w-md mx-auto grid-cols-2 bg-muted">
+              <TabsTrigger value="prayers" className="text-xs sm:text-sm font-medium py-2">
                 Submitted Prayers
               </TabsTrigger>
-              <TabsTrigger value="blessings" className="text-sm font-medium">
+              <TabsTrigger value="blessings" className="text-xs sm:text-sm font-medium py-2">
                 Blessing Requests
               </TabsTrigger>
             </TabsList>
@@ -536,12 +539,12 @@ const Index = () => {
       </main>
 
       {/* Footer */}
-      <footer className="mt-16 py-8 px-4 bg-muted/30 border-t border-border/50">
-        <div className="max-w-4xl mx-auto text-center">
-          <p className="text-muted-foreground">
+      <footer className="mt-12 sm:mt-16 py-6 sm:py-8 px-4 bg-muted/30 border-t border-border/50">
+        <div className="max-w-4xl mx-auto text-center space-y-2">
+          <p className="text-sm sm:text-base text-muted-foreground">
             Get Blessed - Connecting hearts through prayer and blessing
           </p>
-          <p className="text-sm text-muted-foreground mt-2">
+          <p className="text-xs sm:text-sm text-muted-foreground">
             All faiths welcome • Built with love and respect
           </p>
         </div>
