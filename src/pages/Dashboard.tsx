@@ -671,13 +671,13 @@ const Dashboard = ({ user, onNavigateToHome, onLogout }: DashboardProps) => {
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Navigation Tabs matching reference design */}
-        <div className="flex gap-1 mb-8 bg-gray-100 p-1.5 rounded-2xl w-full sm:w-fit overflow-x-auto">
+        <div className="flex gap-0.5 sm:gap-1 mb-8 bg-gray-100 p-1 sm:p-1.5 rounded-2xl w-full overflow-x-auto scrollbar-hide">
           {[
             { id: "overview", label: "Overview" },
             { id: "activity", label: "Activity" },
             { id: "prayers", label: "Prayers & Blessings", shortLabel: "Prayers" },
             { id: "profile", label: "Profile" },
-            { id: "leaderboard", label: "Leaderboard" },
+            { id: "leaderboard", label: "Leaderboard", shortLabel: "Board" },
             { id: "community", label: "Community" }
           ].map((tab) => (
             <Button
@@ -685,13 +685,13 @@ const Dashboard = ({ user, onNavigateToHome, onLogout }: DashboardProps) => {
               variant={activeTab === tab.id ? "default" : "ghost"}
               size="sm"
               onClick={() => setActiveTab(tab.id)}
-              className={`rounded-xl px-2 sm:px-4 py-2.5 font-medium transition-all whitespace-nowrap text-xs sm:text-sm flex-1 sm:flex-initial ${
+              className={`rounded-lg px-1.5 sm:px-4 py-1.5 sm:py-2.5 font-medium transition-all whitespace-nowrap text-xs sm:text-sm flex-1 sm:flex-initial min-w-0 ${
                 activeTab === tab.id 
                   ? 'bg-purple-600 text-white shadow-sm hover:bg-purple-700' 
                   : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
               }`}
             >
-              <span className="sm:hidden">{tab.shortLabel || tab.label}</span>
+              <span className="sm:hidden truncate">{tab.shortLabel || tab.label}</span>
               <span className="hidden sm:inline">{tab.label}</span>
             </Button>
           ))}

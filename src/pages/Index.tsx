@@ -476,7 +476,7 @@ const Index = () => {
                   onClick={() => setActiveFilter("all")}
                   className="text-xs sm:text-sm px-2 sm:px-4 py-1.5 sm:py-2 flex-1 sm:flex-initial"
                 >
-                  All Requests
+                  All
                 </Button>
                 <Button
                   variant={activeFilter === "individual" ? "default" : "ghost"}
