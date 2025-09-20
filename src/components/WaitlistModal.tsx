@@ -17,6 +17,8 @@ export const WaitlistModal = ({
 }: WaitlistModalProps) => {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [organization, setOrganization] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
@@ -48,6 +50,8 @@ export const WaitlistModal = ({
       // Reset form and close modal
       setEmail("");
       setName("");
+      setPhone("");
+      setOrganization("");
       onClose();
     } catch (error) {
       toast({
@@ -115,6 +119,30 @@ export const WaitlistModal = ({
               />
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone number (optional)</Label>
+              <Input
+                id="phone"
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="Your phone number"
+                className="rounded-xl"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="organization">Organization (optional)</Label>
+              <Input
+                id="organization"
+                type="text"
+                value={organization}
+                onChange={(e) => setOrganization(e.target.value)}
+                placeholder="Your organization or church"
+                className="rounded-xl"
+              />
+            </div>
+
             <Button
               type="submit"
               disabled={isSubmitting}
@@ -128,14 +156,6 @@ export const WaitlistModal = ({
               {isSubmitting ? "Adding you..." : "Join Waitlist"}
             </Button>
           </form>
-
-          <Button
-            onClick={onClose}
-            variant="ghost"
-            className="w-full rounded-xl py-3 font-medium text-muted-foreground"
-          >
-            Skip for Now
-          </Button>
 
           <div className="text-center pt-4 border-t border-border/50">
             <p className="text-xs text-muted-foreground">

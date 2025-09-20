@@ -420,10 +420,10 @@ const Index = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="text-center mb-4 sm:mb-6">
             <TabsList className="grid w-full max-w-xs sm:max-w-md mx-auto grid-cols-2 bg-muted h-10 sm:h-auto">
-              <TabsTrigger value="prayers" className="text-xs sm:text-sm font-medium py-2 px-2 sm:px-4">
+              <TabsTrigger value="prayers" className="text-xs sm:text-sm font-medium py-2 px-2 sm:px-4 flex-1">
                 Prayers
               </TabsTrigger>
-              <TabsTrigger value="blessings" className="text-xs sm:text-sm font-medium py-2 px-2 sm:px-4">
+              <TabsTrigger value="blessings" className="text-xs sm:text-sm font-medium py-2 px-2 sm:px-4 flex-1">
                 Blessings
               </TabsTrigger>
             </TabsList>
