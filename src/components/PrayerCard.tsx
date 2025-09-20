@@ -127,6 +127,11 @@ export const PrayerCard = ({
   };
 
   const handleShare = async () => {
+    console.log('=== SHARING DEBUG START ===');
+    console.log('Prayer ID:', id);
+    console.log('Image present:', !!image);
+    console.log('Image length:', image?.length || 0);
+    
     // Create complete prayer data including image
     const prayerData = {
       id,
@@ -143,13 +148,21 @@ export const PrayerCard = ({
       image
     };
     
+    console.log('Prayer data created:', {
+      ...prayerData,
+      image: prayerData.image ? `${prayerData.image.substring(0, 50)}...` : 'none'
+    });
+    
     // Try to create URL with image first
     let shareUrl: string;
     let includesImage = true;
     
     try {
       const encodedData = btoa(JSON.stringify(prayerData));
+      console.log('Encoded data length:', encodedData.length);
+      
       const testUrl = `${window.location.origin}/${type}/${id}?data=${encodedData}`;
+      console.log('Test URL length:', testUrl.length);
       
       // Check if URL is too long (typical browser limit is ~2000 chars)
       if (testUrl.length > 1800) {
@@ -160,15 +173,21 @@ export const PrayerCard = ({
         const encodedDataNoImage = btoa(JSON.stringify(prayerDataNoImage));
         shareUrl = `${window.location.origin}/${type}/${id}?data=${encodedDataNoImage}`;
         includesImage = false;
+        console.log('Final URL (no image):', shareUrl);
       } else {
         shareUrl = testUrl;
+        console.log('Final URL (with image):', shareUrl);
       }
     } catch (error) {
       console.error('Error creating share URL:', error);
       // Fallback to simple URL without data
       shareUrl = `${window.location.origin}/${type}/${id}`;
       includesImage = false;
+      console.log('Fallback URL:', shareUrl);
     }
+    
+    console.log('Includes image in URL:', includesImage);
+    console.log('=== SHARING DEBUG END ===');
     
     // Simple, reliable clipboard copy
     const copyToClipboard = async (text: string) => {

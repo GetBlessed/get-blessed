@@ -196,7 +196,10 @@ export default function SharedPrayer() {
         console.log('Decoded string preview:', decodedString.substring(0, 100));
         
         const decodedData = JSON.parse(decodedString);
-        console.log('Successfully parsed prayer data from URL:', decodedData);
+        console.log('Successfully parsed prayer data from URL:');
+        console.log('- Has image:', !!decodedData.image);
+        console.log('- Image length:', decodedData.image?.length || 0);
+        console.log('- Content preview:', decodedData.content?.substring(0, 50));
         
         // Convert to StoredPrayer format
         const urlPrayer: StoredPrayer = {

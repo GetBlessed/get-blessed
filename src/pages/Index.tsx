@@ -206,7 +206,9 @@ const Index = () => {
     setShowSubmission(false);
 
     console.log('Prayer stored and state updated');
-
+    console.log('New prayer has image:', !!prayer.image);
+    console.log('Image length:', prayer.image?.length || 0);
+    
     // Show auth prompt after submission if user isn't logged in
     if (!user) {
       setShowPostSubmissionAuth(true);
