@@ -278,7 +278,10 @@ const Index = () => {
           <Button
             variant={currentView === "gifts" ? "default" : "ghost"}
             size="sm"
-            onClick={() => setCurrentView("gifts")}
+            onClick={() => {
+              // Gifts temporarily unavailable - show waitlist
+              setShowWaitlist(true);
+            }}
             className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-xl font-medium text-xs sm:text-sm flex-1 sm:flex-initial"
           >
             <Gift className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -295,50 +298,6 @@ const Index = () => {
   //   return <Dashboard user={user} onNavigateToHome={() => setCurrentView("home")} onLogout={handleLogout} />;
   // }
 
-  if (currentView === "gifts") {
-    return (
-      <div className="min-h-screen bg-background">
-        {/* Navigation Header */}
-        <nav className="bg-background border-b border-border/50 px-4 py-3">
-          <div className="max-w-4xl mx-auto flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <h1 className="text-xl font-bold text-primary">GetBlessed</h1>
-              <span className="text-xs text-muted-foreground">• Connecting hearts through prayer</span>
-            </div>
-            {/* Hidden for now - auth will be added later */}
-            {/* {user ? (
-              <Button variant="outline" size="sm" className="flex items-center gap-2" onClick={handleLogout}>
-                <User className="h-4 w-4" />
-                {user.name} • Sign Out
-              </Button>
-            ) : (
-              <Button variant="outline" size="sm" className="flex items-center gap-2" onClick={() => setShowWaitlist(true)}>
-                <User className="h-4 w-4" />
-                Join Waitlist
-              </Button>
-            )} */}
-          </div>
-        </nav>
-
-        {/* Main Navigation */}
-        {renderMainNavigation()}
-
-        <div className="bg-gradient-primary text-primary-foreground px-6 py-8">
-          <div className="max-w-4xl mx-auto">
-            <h1 className="text-3xl font-serif font-semibold mb-4">Spiritual Gifts</h1>
-            <p className="text-primary-foreground/80">Show your support through meaningful gifts</p>
-          </div>
-        </div>
-        <div className="max-w-4xl mx-auto px-6 py-8">
-          <div className="text-center py-12">
-            <Gift className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-            <h2 className="text-xl font-serif font-semibold mb-2">Coming Soon</h2>
-            <p className="text-muted-foreground">The gifts feature will be available soon!</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background">

@@ -27,6 +27,15 @@ export const WaitlistModal = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!name.trim()) {
+      toast({
+        title: "Name required",
+        description: "Please enter your name.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!email.trim()) {
       toast({
         title: "Email required",
@@ -65,8 +74,8 @@ export const WaitlistModal = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-card border shadow-elevated rounded-2xl overflow-hidden">
+    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+      <Card className="w-full max-w-md bg-card border shadow-elevated rounded-2xl overflow-hidden my-4">
         <div className="relative bg-gradient-primary text-primary-foreground p-6">
           <Button
             variant="ghost"
@@ -95,13 +104,14 @@ export const WaitlistModal = ({
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Name (optional)</Label>
+              <Label htmlFor="name">Name</Label>
               <Input
                 id="name"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Your name"
+                required
                 className="rounded-xl"
               />
             </div>
