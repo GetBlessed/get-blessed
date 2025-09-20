@@ -68,6 +68,28 @@ export const storeAllPrayers = (prayers: StoredPrayer[]): void => {
   }
 };
 
+// Delete a prayer by ID
+export const deletePrayer = (id: string): boolean => {
+  try {
+    const prayers = getStoredPrayers();
+    const initialLength = prayers.length;
+    const filteredPrayers = prayers.filter(prayer => prayer.id !== id);
+    
+    if (filteredPrayers.length === initialLength) {
+      console.log('Prayer not found for deletion:', id);
+      return false;
+    }
+    
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(filteredPrayers));
+    console.log('Deleted prayer:', id);
+    console.log('Remaining prayers in storage:', filteredPrayers.length);
+    return true;
+  } catch (error) {
+    console.error('Error deleting prayer:', error);
+    return false;
+  }
+};
+
 // Initialize storage with default prayers if empty
 export const initializePrayerStorage = (defaultPrayers: StoredPrayer[]): void => {
   const existing = getStoredPrayers();

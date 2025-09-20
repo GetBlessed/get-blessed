@@ -102,7 +102,7 @@ export const PrayerSubmission = ({ onSubmit }: PrayerSubmissionProps) => {
           content: content.trim(),
           type,
           category: category || "General",
-          author: author.trim(),
+          author: anonymous ? "Anonymous" : (author.trim() || "You"),
           anonymous,
           urgent,
           onBehalfOf: onBehalfOf.trim(),

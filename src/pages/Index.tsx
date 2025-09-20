@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Heart, Users, User, Home, Gift } from "lucide-react";
 import Dashboard from "./Dashboard";
-import { getStoredPrayers, storePrayer, initializePrayerStorage, type StoredPrayer } from "@/utils/prayerStorage";
+import { getStoredPrayers, storePrayer, deletePrayer, initializePrayerStorage, type StoredPrayer } from "@/utils/prayerStorage";
 
 interface Prayer extends StoredPrayer {}
 
@@ -220,6 +220,13 @@ const Index = () => {
     }
   };
 
+  const handleDeletePrayer = (prayerId: string) => {
+    const success = deletePrayer(prayerId);
+    if (success) {
+      setPrayers(prev => prev.filter(p => p.id !== prayerId));
+    }
+  };
+
   const filteredPrayers = prayers.filter(prayer => {
     const typeFilter = activeTab === "prayers" ? prayer.type === "prayer" : prayer.type === "blessing";
     const organizationFilter = activeFilter === "all" ? true : 
@@ -424,6 +431,8 @@ const Index = () => {
                 <PrayerCard
                   key={prayer.id}
                   {...prayer}
+                  currentUser="You" // Simple user identifier for demo
+                  onDelete={handleDeletePrayer}
                 />
               ))}
             </div>
@@ -466,6 +475,8 @@ const Index = () => {
                 <PrayerCard
                   key={prayer.id}
                   {...prayer}
+                  currentUser="You" // Simple user identifier for demo
+                  onDelete={handleDeletePrayer}
                 />
               ))}
             </div>

@@ -191,12 +191,22 @@ export default function SharedPrayer() {
     if (encodedData) {
       try {
         console.log('Attempting to decode URL data...');
-        // Simple base64 decoding with proper UTF-8 handling
-        const jsonString = atob(encodedData);
-        console.log('Decoded string length:', jsonString.length);
-        console.log('Decoded string preview:', jsonString.substring(0, 100));
+        let decodedData;
         
-        const decodedData = JSON.parse(jsonString);
+        // Try simple base64 decoding first
+        try {
+          const jsonString = atob(encodedData);
+          decodedData = JSON.parse(jsonString);
+          console.log('Successfully decoded with simple base64');
+        } catch (error) {
+          console.log('Simple decoding failed, trying URL-decoded base64...');
+          // Try decoding URL-encoded base64
+          const decodedBase64 = decodeURIComponent(encodedData);
+          const jsonString = atob(decodedBase64);
+          decodedData = JSON.parse(jsonString);
+          console.log('Successfully decoded with URL-decoded base64');
+        }
+        
         console.log('Successfully parsed prayer data from URL:');
         console.log('- Has image:', !!decodedData.image);
         console.log('- Image length:', decodedData.image?.length || 0);

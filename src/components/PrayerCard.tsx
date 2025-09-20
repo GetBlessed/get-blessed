@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Heart, MessageCircle, Users, Send, Gift, AlertCircle, Share2 } from "lucide-react";
+import { Heart, MessageCircle, Users, Send, Gift, AlertCircle, Share2, Trash2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -18,6 +18,8 @@ interface PrayerCardProps {
   onBehalfOf?: string;
   organizationType?: "individual" | "organization";
   image?: string;
+  currentUser?: string | null; // Current user's name for delete functionality
+  onDelete?: (id: string) => void; // Callback for deletion
 }
 
 export const PrayerCard = ({ 
@@ -32,7 +34,9 @@ export const PrayerCard = ({
   urgent = false,
   onBehalfOf,
   organizationType = "individual",
-  image
+  image,
+  currentUser,
+  onDelete
 }: PrayerCardProps) => {
   const [supportCount, setSupportCount] = useState(initialSupportCount);
   const [prayingCount, setPrayingCount] = useState(Math.floor(Math.random() * 15) + 5);
@@ -123,6 +127,16 @@ export const PrayerCard = ({
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleAddComment(e);
+    }
+  };
+
+  const handleDelete = () => {
+    if (onDelete) {
+      onDelete(id);
+      toast({
+        title: `${type === 'prayer' ? 'Prayer' : 'Blessing'} deleted`,
+        description: "Your post has been removed from the community feed.",
+      });
     }
   };
 
@@ -358,6 +372,17 @@ export const PrayerCard = ({
               <span className="ml-2">{timeAgo}</span>
             </div>
           </div>
+          {/* Delete button - only show if user can delete this prayer */}
+          {currentUser && !anonymous && (author === currentUser || timeAgo === "Just now") && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleDelete}
+              className="flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg hover:text-red-600 hover:bg-red-50 transition-all text-xs"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          )}
         </div>
         
         {/* Enhanced Support Actions */}
