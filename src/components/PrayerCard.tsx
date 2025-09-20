@@ -128,9 +128,10 @@ export const PrayerCard = ({
 
   const handleShare = async () => {
     const shareUrl = `${window.location.origin}/${type}/${id}`;
+    const shareText = `Sharing a ${type} with you: ${shareUrl}`;
     
     try {
-      await navigator.clipboard.writeText(shareUrl);
+      await navigator.clipboard.writeText(shareText);
       toast({
         title: "Link copied! 🔗",
         description: "Share this with others to spread the love.",
@@ -138,7 +139,7 @@ export const PrayerCard = ({
     } catch (err) {
       // Fallback for browsers that don't support clipboard API
       const textArea = document.createElement('textarea');
-      textArea.value = shareUrl;
+      textArea.value = shareText;
       document.body.appendChild(textArea);
       textArea.select();
       document.execCommand('copy');
