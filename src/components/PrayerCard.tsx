@@ -127,13 +127,7 @@ export const PrayerCard = ({
   };
 
   const handleShare = async () => {
-    console.log('=== SHARE FUNCTION CALLED ===');
-    console.log('Prayer data for sharing:', { 
-      id, content: content.substring(0, 50), type, author, anonymous, 
-      supportCount, timeAgo, category, urgent, onBehalfOf, organizationType, image 
-    });
-    
-    // Encode prayer data in URL for cross-domain sharing
+    // Create simple, short share data
     const prayerData = {
       id,
       content,
@@ -146,104 +140,83 @@ export const PrayerCard = ({
       urgent,
       onBehalfOf: onBehalfOf || "",
       organizationType,
-      image: image || undefined
+      image
     };
     
-    console.log('Prepared prayer data:', prayerData);
-    
-    // Encode the prayer data as base64 URL parameter
-    const jsonString = JSON.stringify(prayerData);
-    console.log('JSON string length:', jsonString.length);
-    
-    const encodedData = btoa(jsonString);
-    console.log('Encoded data length:', encodedData.length);
-    console.log('Encoded data preview:', encodedData.substring(0, 100) + '...');
-    
+    // Create share URL with encoded data
+    const encodedData = btoa(JSON.stringify(prayerData));
     const shareUrl = `${window.location.origin}/${type}/${id}?data=${encodedData}`;
-    const shareText = `Sharing a ${type} with you: ${shareUrl}`;
     
-    console.log('Final share URL:', shareUrl);
-    console.log('URL length:', shareUrl.length);
-    
-    // Try native Web Share API first (works better on mobile)
-    if (navigator.share && /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+    // Simple, reliable clipboard copy
+    const copyToClipboard = async (text: string) => {
+      // Method 1: Modern clipboard API (if available and secure)
+      if (navigator.clipboard && window.isSecureContext) {
+        try {
+          await navigator.clipboard.writeText(text);
+          return true;
+        } catch (e) {
+          console.log('Clipboard API failed');
+        }
+      }
+      
+      // Method 2: Selection + execCommand (most reliable)
       try {
-        await navigator.share({
-          title: `Shared ${type}`,
-          text: `Someone shared a ${type} with you`,
-          url: shareUrl,
-        });
-        toast({
-          title: "Shared! 📱",
-          description: "Link shared successfully.",
-        });
-        console.log('Share URL shared using Web Share API');
-        return;
-      } catch (shareErr) {
-        console.log('Web Share API failed or cancelled:', shareErr);
-        // Continue to clipboard methods
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'absolute';
+        textarea.style.left = '-9999px';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        
+        textarea.select();
+        textarea.setSelectionRange(0, textarea.value.length);
+        
+        const success = document.execCommand('copy');
+        document.body.removeChild(textarea);
+        
+        return success;
+      } catch (e) {
+        console.log('ExecCommand failed');
+        return false;
       }
-    }
+    };
     
-    // Try clipboard API
-    if (navigator.clipboard && window.isSecureContext) {
-      try {
-        await navigator.clipboard.writeText(shareText);
-        toast({
-          title: "Link copied! 🔗",
-          description: "Share this with others to spread the love.",
-        });
-        console.log('Share URL copied to clipboard successfully');
-        return;
-      } catch (clipboardErr) {
-        console.error('Clipboard API failed:', clipboardErr);
-        // Continue to fallback
-      }
-    }
+    // Try to copy
+    const success = await copyToClipboard(`Sharing a ${type} with you: ${shareUrl}`);
     
-    // Fallback method with better error detection
-    try {
-      const textArea = document.createElement('textarea');
-      textArea.value = shareText;
-      textArea.style.position = 'fixed';
-      textArea.style.left = '-999999px';
-      textArea.style.top = '-999999px';
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
+    if (success) {
+      toast({
+        title: "Link copied! 🔗",
+        description: "Share this with others to spread the love.",
+      });
+    } else {
+      // Final fallback - show the URL
+      toast({
+        title: "Copy this link manually:",
+        description: shareUrl.length > 50 ? shareUrl.substring(0, 50) + "..." : shareUrl,
+        duration: 10000,
+      });
       
-      const successful = document.execCommand('copy');
-      document.body.removeChild(textArea);
-      
-      if (successful) {
-        toast({
-          title: "Link copied! 🔗",
-          description: "Share this with others to spread the love.",
-        });
-        console.log('Share URL copied using fallback method');
-      } else {
-        throw new Error('execCommand returned false');
-      }
-    } catch (fallbackErr) {
-      console.error('All clipboard methods failed:', fallbackErr);
-      
-      // Show the URL in a dialog as last resort
-      const userCopy = prompt(`Copy this ${type} link to share:\n\n(Tap and hold to select all, then copy)`, shareUrl);
-      
-      if (userCopy !== null) {
-        toast({
-          title: "Please copy manually 📋",
-          description: "Select and copy the link that was shown.",
-        });
-      } else {
-        toast({
-          title: "Share failed ❌",
-          description: "Unable to copy link. Try using a different browser.",
-          variant: "destructive"
-        });
-      }
+      // Also try to select the URL if displayed somewhere
+      setTimeout(() => {
+        const urlText = shareUrl;
+        if (window.getSelection) {
+          const selection = window.getSelection();
+          const range = document.createRange();
+          const span = document.createElement('span');
+          span.textContent = urlText;
+          span.style.position = 'fixed';
+          span.style.top = '0';
+          span.style.left = '0';
+          span.style.opacity = '0.01';
+          document.body.appendChild(span);
+          range.selectNodeContents(span);
+          selection?.removeAllRanges();
+          selection?.addRange(range);
+          setTimeout(() => document.body.removeChild(span), 1000);
+        }
+      }, 100);
     }
-    console.log('=== SHARE FUNCTION COMPLETED ===');
   };
 
   const getInitials = (name: string) => {
