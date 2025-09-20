@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { AuthModal } from "@/components/AuthModal";
 import { Link } from "react-router-dom";
 import { getStoredPrayer, type StoredPrayer } from "@/utils/prayerStorage";
+import { debugStorageContents } from "@/utils/debugStorage";
 
 // Fallback mock data for prayers that don't exist in storage
 const mockPrayers: Record<string, StoredPrayer> = {
@@ -167,6 +168,30 @@ export default function SharedPrayer() {
   useEffect(() => {
     if (!id) return;
     
+    console.log('SharedPrayer: Loading prayer with ID:', id, 'Type:', type);
+    
+    // Check if prayer data is encoded in URL parameters (for cross-domain sharing)
+    const urlParams = new URLSearchParams(location.search);
+    const encodedData = urlParams.get('data');
+    
+    if (encodedData) {
+      try {
+        const decodedData = JSON.parse(atob(encodedData));
+        console.log('Found prayer in URL data:', decodedData);
+        
+        // Convert to StoredPrayer format
+        const urlPrayer: StoredPrayer = {
+          ...decodedData,
+          createdAt: new Date().toISOString() // Default createdAt
+        };
+        
+        setPrayer(urlPrayer);
+        return;
+      } catch (error) {
+        console.error('Error decoding URL prayer data:', error);
+      }
+    }
+    
     // First try to get from storage
     const storedPrayer = getStoredPrayer(id);
     if (storedPrayer) {
@@ -180,10 +205,14 @@ export default function SharedPrayer() {
         setPrayer(mockPrayer);
       } else {
         console.log('Prayer not found - ID not in storage or mock data');
+        
+        // Debug storage contents
+        debugStorageContents();
+        
         setPrayer(null);
       }
     }
-  }, [id]);
+  }, [id, location.search]);
   
   // Debug logging
   console.log('SharedPrayer Debug:', { type, id, pathname: location.pathname, prayerFound: !!prayer });

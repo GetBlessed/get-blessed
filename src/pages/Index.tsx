@@ -198,10 +198,14 @@ const Index = () => {
       createdAt: new Date().toISOString()
     };
     
+    console.log('Creating new prayer:', prayer.id, prayer.type, prayer.content.substring(0, 50));
+    
     // Store the prayer and update state
     storePrayer(prayer);
     setPrayers(prev => [prayer, ...prev]);
     setShowSubmission(false);
+
+    console.log('Prayer stored and state updated');
 
     // Show auth prompt after submission if user isn't logged in
     if (!user) {

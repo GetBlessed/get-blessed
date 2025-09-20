@@ -127,10 +127,28 @@ export const PrayerCard = ({
   };
 
   const handleShare = async () => {
-    const shareUrl = `${window.location.origin}/${type}/${id}`;
+    // Encode prayer data in URL for cross-domain sharing
+    const prayerData = {
+      id,
+      content,
+      type,
+      author: anonymous ? "Anonymous" : author,
+      supportCount,
+      timeAgo,
+      category,
+      anonymous,
+      urgent,
+      onBehalfOf,
+      organizationType,
+      image
+    };
+    
+    // Encode the prayer data as base64 URL parameter
+    const encodedData = btoa(JSON.stringify(prayerData));
+    const shareUrl = `${window.location.origin}/${type}/${id}?data=${encodedData}`;
     const shareText = `Sharing a ${type} with you: ${shareUrl}`;
     
-    console.log('Share Debug:', { type, id, shareUrl, shareText });
+    console.log('Share Debug:', { type, id, shareUrl, encodedData: encodedData.substring(0, 50) + '...' });
     
     try {
       await navigator.clipboard.writeText(shareText);

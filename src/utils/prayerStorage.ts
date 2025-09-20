@@ -22,7 +22,9 @@ const STORAGE_KEY = 'getblessed_prayers';
 export const getStoredPrayers = (): StoredPrayer[] => {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : [];
+    const parsed = stored ? JSON.parse(stored) : [];
+    console.log('Retrieved prayers from storage:', parsed.length, 'prayers found');
+    return parsed;
   } catch (error) {
     console.error('Error reading prayers from storage:', error);
     return [];
@@ -33,7 +35,11 @@ export const getStoredPrayers = (): StoredPrayer[] => {
 export const getStoredPrayer = (id: string): StoredPrayer | null => {
   try {
     const prayers = getStoredPrayers();
-    return prayers.find(prayer => prayer.id === id) || null;
+    console.log('Looking for prayer ID:', id);
+    console.log('Available prayer IDs:', prayers.map(p => p.id));
+    const found = prayers.find(prayer => prayer.id === id) || null;
+    console.log('Found prayer:', found ? 'Yes' : 'No');
+    return found;
   } catch (error) {
     console.error('Error finding prayer:', error);
     return null;
@@ -46,6 +52,8 @@ export const storePrayer = (prayer: StoredPrayer): void => {
     const prayers = getStoredPrayers();
     const updatedPrayers = [prayer, ...prayers];
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedPrayers));
+    console.log('Stored prayer:', prayer.id, prayer.type, prayer.content.substring(0, 50));
+    console.log('Total prayers in storage:', updatedPrayers.length);
   } catch (error) {
     console.error('Error storing prayer:', error);
   }
