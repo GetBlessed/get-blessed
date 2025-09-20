@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PrayerCard } from "@/components/PrayerCard";
 import { PrayerSubmission } from "@/components/PrayerSubmission";
 import AuthModal from "@/components/AuthModal";
@@ -7,25 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Heart, Users, User, Home, Gift } from "lucide-react";
 import Dashboard from "./Dashboard";
+import { getStoredPrayers, storePrayer, initializePrayerStorage, type StoredPrayer } from "@/utils/prayerStorage";
 
-interface Prayer {
-  id: string;
-  content: string;
-  type: "prayer" | "blessing";
-  author: string;
-  supportCount: number;
-  timeAgo: string;
-  category: string;
-  anonymous: boolean;
-  urgent: boolean;
-  onBehalfOf: string;
-  organizationType: "individual" | "organization";
-  scripture?: string;
-  image?: string;
-}
+interface Prayer extends StoredPrayer {}
 
-// Mock data for initial prayers with more community samples
-const initialPrayers: Prayer[] = [
+// Default prayers for initialization
+const defaultPrayers: StoredPrayer[] = [
   {
     id: "1",
     content: "Going through a difficult time with my health. Would appreciate prayers for strength and healing during my treatment journey.",
@@ -37,7 +24,8 @@ const initialPrayers: Prayer[] = [
     anonymous: false,
     urgent: true,
     onBehalfOf: "",
-    organizationType: "individual"
+    organizationType: "individual",
+    createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
   },
   {
     id: "2",
@@ -50,7 +38,8 @@ const initialPrayers: Prayer[] = [
     anonymous: false,
     urgent: false,
     onBehalfOf: "My sister",
-    organizationType: "individual"
+    organizationType: "individual",
+    createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString()
   },
   {
     id: "3",
@@ -63,7 +52,8 @@ const initialPrayers: Prayer[] = [
     anonymous: false,
     urgent: false,
     onBehalfOf: "",
-    organizationType: "individual"
+    organizationType: "individual",
+    createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString()
   },
   {
     id: "4",
@@ -76,7 +66,8 @@ const initialPrayers: Prayer[] = [
     anonymous: false,
     urgent: false,
     onBehalfOf: "Our community",
-    organizationType: "organization"
+    organizationType: "organization",
+    createdAt: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString()
   },
   {
     id: "5",
@@ -89,7 +80,8 @@ const initialPrayers: Prayer[] = [
     anonymous: true,
     urgent: false,
     onBehalfOf: "My family",
-    organizationType: "individual"
+    organizationType: "individual",
+    createdAt: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString()
   },
   {
     id: "6",
@@ -102,7 +94,8 @@ const initialPrayers: Prayer[] = [
     anonymous: false,
     urgent: false,
     onBehalfOf: "Families in need",
-    organizationType: "organization"
+    organizationType: "organization",
+    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
   },
   {
     id: "7",
@@ -115,7 +108,8 @@ const initialPrayers: Prayer[] = [
     anonymous: false,
     urgent: false,
     onBehalfOf: "Community donors",
-    organizationType: "organization"
+    organizationType: "organization",
+    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
   },
   {
     id: "8",
@@ -128,7 +122,8 @@ const initialPrayers: Prayer[] = [
     anonymous: false,
     urgent: false,
     onBehalfOf: "All seeking healing",
-    organizationType: "organization"
+    organizationType: "organization",
+    createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
   },
   {
     id: "9",
@@ -141,7 +136,8 @@ const initialPrayers: Prayer[] = [
     anonymous: false,
     urgent: false,
     onBehalfOf: "Our community",
-    organizationType: "organization"
+    organizationType: "organization",
+    createdAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString()
   },
   {
     id: "10",
@@ -154,12 +150,13 @@ const initialPrayers: Prayer[] = [
     anonymous: false,
     urgent: false,
     onBehalfOf: "All nations",
-    organizationType: "organization"
+    organizationType: "organization",
+    createdAt: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString()
   }
 ];
 
 const Index = () => {
-  const [prayers, setPrayers] = useState(initialPrayers);
+  const [prayers, setPrayers] = useState<StoredPrayer[]>([]);
   const [showSubmission, setShowSubmission] = useState(false);
   const [activeTab, setActiveTab] = useState("prayers");
   const [activeFilter, setActiveFilter] = useState("all");
@@ -172,6 +169,12 @@ const Index = () => {
     totalBlessings: 892,
     activeCommunity: 3421
   });
+
+  // Initialize prayers from storage on component mount
+  useEffect(() => {
+    initializePrayerStorage(defaultPrayers);
+    setPrayers(getStoredPrayers());
+  }, []);
 
   const handleNewPrayer = (newPrayer: {
     content: string;
@@ -187,13 +190,16 @@ const Index = () => {
     forwardPhone?: string;
     image?: string;
   }) => {
-    const prayer = {
+    const prayer: StoredPrayer = {
       id: Date.now().toString(),
       ...newPrayer,
       supportCount: 0,
-      timeAgo: "Just now"
+      timeAgo: "Just now",
+      createdAt: new Date().toISOString()
     };
     
+    // Store the prayer and update state
+    storePrayer(prayer);
     setPrayers(prev => [prayer, ...prev]);
     setShowSubmission(false);
 

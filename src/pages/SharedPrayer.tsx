@@ -3,13 +3,14 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Heart, MessageCircle, Users, Send, Gift, AlertCircle, ArrowLeft } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { AuthModal } from "@/components/AuthModal";
 import { Link } from "react-router-dom";
+import { getStoredPrayer, type StoredPrayer } from "@/utils/prayerStorage";
 
-// Mock data - in a real app this would come from an API
-const mockPrayers = {
+// Fallback mock data for prayers that don't exist in storage
+const mockPrayers: Record<string, StoredPrayer> = {
   "1": {
     id: "1",
     content: "Going through a difficult time with my health. Would appreciate prayers for strength and healing during my treatment journey.",
@@ -20,7 +21,9 @@ const mockPrayers = {
     category: "Health",
     anonymous: false,
     urgent: true,
+    onBehalfOf: "",
     organizationType: "individual" as const,
+    createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
   },
   "2": {
     id: "2",
@@ -34,6 +37,7 @@ const mockPrayers = {
     urgent: false,
     onBehalfOf: "My sister",
     organizationType: "individual" as const,
+    createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString()
   },
   "3": {
     id: "3",
@@ -45,7 +49,9 @@ const mockPrayers = {
     category: "Work",
     anonymous: false,
     urgent: false,
+    onBehalfOf: "",
     organizationType: "individual" as const,
+    createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString()
   },
   "4": {
     id: "4",
@@ -59,6 +65,7 @@ const mockPrayers = {
     urgent: false,
     onBehalfOf: "Our community",
     organizationType: "organization" as const,
+    createdAt: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString()
   },
   "5": {
     id: "5",
@@ -72,6 +79,7 @@ const mockPrayers = {
     urgent: false,
     onBehalfOf: "My family",
     organizationType: "individual" as const,
+    createdAt: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString()
   },
   "6": {
     id: "6",
@@ -85,6 +93,7 @@ const mockPrayers = {
     urgent: false,
     onBehalfOf: "Families in need",
     organizationType: "organization" as const,
+    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
   },
   "7": {
     id: "7",
@@ -98,6 +107,7 @@ const mockPrayers = {
     urgent: false,
     onBehalfOf: "Community donors",
     organizationType: "organization" as const,
+    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
   },
   "8": {
     id: "8",
@@ -111,6 +121,7 @@ const mockPrayers = {
     urgent: false,
     onBehalfOf: "All seeking healing",
     organizationType: "organization" as const,
+    createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
   },
   "9": {
     id: "9",
@@ -124,6 +135,7 @@ const mockPrayers = {
     urgent: false,
     onBehalfOf: "Our community",
     organizationType: "organization" as const,
+    createdAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString()
   },
   "10": {
     id: "10",
@@ -137,6 +149,7 @@ const mockPrayers = {
     urgent: false,
     onBehalfOf: "All nations",
     organizationType: "organization" as const,
+    createdAt: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString()
   }
 };
 
@@ -145,20 +158,38 @@ export default function SharedPrayer() {
   const location = useLocation();
   const { toast } = useToast();
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [prayer, setPrayer] = useState<StoredPrayer | null>(null);
   
   // Extract type from pathname
   const type = location.pathname.startsWith('/blessing/') ? 'blessing' : 'prayer';
   
+  // Load prayer data on component mount
+  useEffect(() => {
+    if (!id) return;
+    
+    // First try to get from storage
+    const storedPrayer = getStoredPrayer(id);
+    if (storedPrayer) {
+      console.log('Found prayer in storage:', storedPrayer);
+      setPrayer(storedPrayer);
+    } else {
+      // Fall back to mock data
+      const mockPrayer = mockPrayers[id as keyof typeof mockPrayers];
+      if (mockPrayer) {
+        console.log('Found prayer in mock data:', mockPrayer);
+        setPrayer(mockPrayer);
+      } else {
+        console.log('Prayer not found - ID not in storage or mock data');
+        setPrayer(null);
+      }
+    }
+  }, [id]);
+  
   // Debug logging
-  console.log('SharedPrayer Debug:', { type, id, pathname: location.pathname, mockPrayers: Object.keys(mockPrayers) });
-  
-  const prayer = mockPrayers[id as keyof typeof mockPrayers];
-  
-  console.log('Found prayer:', prayer);
-  console.log('Prayer type matches URL type:', prayer?.type === type);
+  console.log('SharedPrayer Debug:', { type, id, pathname: location.pathname, prayerFound: !!prayer });
   
   if (!prayer) {
-    console.log('Prayer not found - ID not in mockPrayers');
+    console.log('Prayer not found - ID not in storage or mock data');
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4">
         <div className="text-center space-y-4">
@@ -264,6 +295,24 @@ export default function SharedPrayer() {
             <p className="text-foreground leading-relaxed font-medium text-base sm:text-lg break-words hyphens-auto overflow-wrap-anywhere">
               {prayer.content}
             </p>
+            
+            {/* Image Display */}
+            {prayer.image && (
+              <div className="mt-3">
+                <img 
+                  src={prayer.image} 
+                  alt="Prayer/blessing image" 
+                  className="w-full max-h-64 object-cover rounded-lg border border-border/50"
+                />
+              </div>
+            )}
+
+            {/* On Behalf Of */}
+            {prayer.onBehalfOf && (
+              <div className="text-sm text-muted-foreground italic">
+                On behalf of: {prayer.onBehalfOf}
+              </div>
+            )}
             
             {/* Author & Time */}
             <div className="flex items-center gap-3 pt-2">
