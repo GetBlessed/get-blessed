@@ -253,16 +253,16 @@ const Dashboard = ({ user, onNavigateToHome, onLogout }: DashboardProps) => {
         return (
           <>
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-8 sm:mb-12">
               {stats.map((stat, index) => (
-                <Card key={index} className="p-6 rounded-2xl border-border/30 shadow-soft hover:shadow-medium transition-all bg-card">
-                  <div className="flex items-start gap-4">
-                    <div className={`w-12 h-12 rounded-xl ${stat.bgColor} flex items-center justify-center flex-shrink-0`}>
-                      <stat.icon className={`h-6 w-6 ${stat.color}`} />
+                <Card key={index} className="p-3 sm:p-6 rounded-2xl border-border/30 shadow-soft hover:shadow-medium transition-all bg-card">
+                  <div className="flex items-start gap-2 sm:gap-4">
+                    <div className={`w-8 h-8 sm:w-12 sm:h-12 rounded-xl ${stat.bgColor} flex items-center justify-center flex-shrink-0`}>
+                      <stat.icon className={`h-4 w-4 sm:h-6 sm:w-6 ${stat.color}`} />
                     </div>
-                    <div className="flex-1">
-                      <p className="text-sm text-muted-foreground font-medium mb-1">{stat.title}</p>
-                      <p className="text-2xl font-bold text-foreground">{stat.value}</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs sm:text-sm text-muted-foreground font-medium mb-1 break-words">{stat.title}</p>
+                      <p className="text-lg sm:text-2xl font-bold text-foreground break-words">{stat.value}</p>
                     </div>
                   </div>
                 </Card>
@@ -638,43 +638,44 @@ const Dashboard = ({ user, onNavigateToHome, onLogout }: DashboardProps) => {
 
       {/* Header with gradient background matching reference */}
       <div 
-        className="text-white px-6 py-8 relative overflow-hidden"
+        className="text-white px-4 sm:px-6 py-6 sm:py-8 relative overflow-hidden"
         style={{
           background: 'linear-gradient(135deg, #8B5CF6 0%, #A855F7 50%, #C084FC 100%)'
         }}
       >
         <div className="max-w-6xl mx-auto relative z-10">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Avatar className="w-16 h-16 border-2 border-white/30">
+          <div className="flex flex-col sm:flex-row items-center sm:items-center sm:justify-between gap-4 sm:gap-0">
+            <div className="flex items-center gap-3 sm:gap-4 text-center sm:text-left">
+              <Avatar className="w-12 h-12 sm:w-16 sm:h-16 border-2 border-white/30">
                 <AvatarImage src={profilePicture || userProfile.profilePicture || ""} alt={userData.name} />
-                <AvatarFallback className="text-lg bg-white/20 text-white backdrop-blur-sm">
+                <AvatarFallback className="text-sm sm:text-lg bg-white/20 text-white backdrop-blur-sm">
                   {userData.name.split(' ').map(n => n[0]).join('').toUpperCase()}
                 </AvatarFallback>
               </Avatar>
-              <div>
-                <h1 className="text-3xl font-bold mb-1">Welcome back, {userData.name}</h1>
-                <p className="text-white/80 text-lg">{userData.title}</p>
+              <div className="min-w-0">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-1 break-words">Welcome back, {userData.name}</h1>
+                <p className="text-white/80 text-sm sm:text-base lg:text-lg break-words">{userData.title}</p>
               </div>
             </div>
             <Button 
               onClick={handleGivePrayer}
-              className="bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm rounded-xl px-6 py-3 font-medium"
+              className="bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm rounded-xl px-3 sm:px-6 py-2 sm:py-3 font-medium text-sm sm:text-base w-full sm:w-auto"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Give Prayer or Blessing
+              <span className="hidden sm:inline">Give Prayer or Blessing</span>
+              <span className="sm:hidden">Give Prayer</span>
             </Button>
           </div>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Navigation Tabs matching reference design */}
-        <div className="flex gap-1 mb-8 bg-gray-100 p-1.5 rounded-2xl w-fit overflow-x-auto">
+        <div className="flex gap-1 mb-8 bg-gray-100 p-1.5 rounded-2xl w-full sm:w-fit overflow-x-auto">
           {[
             { id: "overview", label: "Overview" },
             { id: "activity", label: "Activity" },
-            { id: "prayers", label: "Prayers & Blessings" },
+            { id: "prayers", label: "Prayers & Blessings", shortLabel: "Prayers" },
             { id: "profile", label: "Profile" },
             { id: "leaderboard", label: "Leaderboard" },
             { id: "community", label: "Community" }
@@ -684,13 +685,14 @@ const Dashboard = ({ user, onNavigateToHome, onLogout }: DashboardProps) => {
               variant={activeTab === tab.id ? "default" : "ghost"}
               size="sm"
               onClick={() => setActiveTab(tab.id)}
-              className={`rounded-xl px-4 py-2.5 font-medium transition-all whitespace-nowrap ${
+              className={`rounded-xl px-2 sm:px-4 py-2.5 font-medium transition-all whitespace-nowrap text-xs sm:text-sm flex-1 sm:flex-initial ${
                 activeTab === tab.id 
                   ? 'bg-purple-600 text-white shadow-sm hover:bg-purple-700' 
                   : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
               }`}
             >
-              {tab.label}
+              <span className="sm:hidden">{tab.shortLabel || tab.label}</span>
+              <span className="hidden sm:inline">{tab.label}</span>
             </Button>
           ))}
         </div>
