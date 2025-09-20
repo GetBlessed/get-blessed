@@ -165,28 +165,83 @@ export const PrayerCard = ({
     console.log('Final share URL:', shareUrl);
     console.log('URL length:', shareUrl.length);
     
+    // Try native Web Share API first (works better on mobile)
+    if (navigator.share && /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+      try {
+        await navigator.share({
+          title: `Shared ${type}`,
+          text: `Someone shared a ${type} with you`,
+          url: shareUrl,
+        });
+        toast({
+          title: "Shared! 📱",
+          description: "Link shared successfully.",
+        });
+        console.log('Share URL shared using Web Share API');
+        return;
+      } catch (shareErr) {
+        console.log('Web Share API failed or cancelled:', shareErr);
+        // Continue to clipboard methods
+      }
+    }
+    
+    // Try clipboard API
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(shareText);
+        toast({
+          title: "Link copied! 🔗",
+          description: "Share this with others to spread the love.",
+        });
+        console.log('Share URL copied to clipboard successfully');
+        return;
+      } catch (clipboardErr) {
+        console.error('Clipboard API failed:', clipboardErr);
+        // Continue to fallback
+      }
+    }
+    
+    // Fallback method with better error detection
     try {
-      await navigator.clipboard.writeText(shareText);
-      toast({
-        title: "Link copied! 🔗",
-        description: "Share this with others to spread the love.",
-      });
-      console.log('Share URL copied to clipboard successfully');
-    } catch (err) {
-      console.error('Clipboard API failed, using fallback:', err);
-      // Fallback for browsers that don't support clipboard API
       const textArea = document.createElement('textarea');
       textArea.value = shareText;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
       document.body.appendChild(textArea);
+      textArea.focus();
       textArea.select();
-      document.execCommand('copy');
+      
+      const successful = document.execCommand('copy');
       document.body.removeChild(textArea);
       
-      toast({
-        title: "Link copied! 🔗",
-        description: "Share this with others to spread the love.",
-      });
-      console.log('Share URL copied using fallback method');
+      if (successful) {
+        toast({
+          title: "Link copied! 🔗",
+          description: "Share this with others to spread the love.",
+        });
+        console.log('Share URL copied using fallback method');
+      } else {
+        throw new Error('execCommand returned false');
+      }
+    } catch (fallbackErr) {
+      console.error('All clipboard methods failed:', fallbackErr);
+      
+      // Show the URL in a dialog as last resort
+      const userCopy = prompt(`Copy this ${type} link to share:\n\n(Tap and hold to select all, then copy)`, shareUrl);
+      
+      if (userCopy !== null) {
+        toast({
+          title: "Please copy manually 📋",
+          description: "Select and copy the link that was shown.",
+        });
+      } else {
+        toast({
+          title: "Share failed ❌",
+          description: "Unable to copy link. Try using a different browser.",
+          variant: "destructive"
+        });
+      }
     }
     console.log('=== SHARE FUNCTION COMPLETED ===');
   };
