@@ -233,82 +233,80 @@ export const PrayerCard = ({
         </div>
         
         {/* Enhanced Support Actions */}
-        <div className="space-y-4 pt-4 border-t border-border/30">
-          <div className="flex items-center justify-between gap-3">
+        <div className="space-y-3 pt-4 border-t border-border/30">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             <Button
               variant="ghost"
               size="sm"
               onClick={handleSupport}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-300 ${
+              className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl transition-all duration-300 text-xs w-full ${
                 hasSupported 
                   ? 'text-primary bg-primary/10 animate-celebrate shadow-sm' 
                   : 'hover:text-primary hover:bg-primary/5 hover:shadow-sm'
               }`}
             >
               <Heart className={`h-4 w-4 transition-all ${hasSupported ? 'fill-current animate-heart-beat' : ''}`} />
-              <span className="text-xs font-medium">
-                {type === "prayer" ? "Here with you" : "Holding you in prayer"}
+              <span className="font-medium truncate">
+                {type === "prayer" ? "Here with you" : "Holding you"}
               </span>
-              <span className="text-xs font-semibold">{supportCount}</span>
+              <span className="font-semibold">{supportCount}</span>
             </Button>
             
             <Button
               variant="ghost"
               size="sm" 
               onClick={handlePraying}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-300 ${
+              className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl transition-all duration-300 text-xs w-full ${
                 hasPrayed 
                   ? 'text-blue-600 bg-blue-50 animate-bounce-gentle shadow-sm' 
                   : 'hover:text-blue-600 hover:bg-blue-50 hover:shadow-sm'
               }`}
             >
               <Users className={`h-4 w-4 ${hasPrayed ? 'fill-current' : ''}`} />
-              <span className="text-xs font-medium">
-                {type === "prayer" ? "Praying with you" : "Cheering you on"}
+              <span className="font-medium truncate">
+                {type === "prayer" ? "Praying" : "Cheering"}
               </span>
-              <span className="text-xs font-semibold">{prayingCount}</span>
+              <span className="font-semibold">{prayingCount}</span>
             </Button>
             
             <Button
               variant="ghost"
               size="sm"
               onClick={handleSendLove}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-300 ${
+              className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl transition-all duration-300 text-xs w-full ${
                 hasSentLove 
                   ? 'text-pink-600 bg-pink-50 animate-pulse-love shadow-sm' 
                   : 'hover:text-pink-600 hover:bg-pink-50 hover:shadow-sm'
               }`}
             >
               <Send className={`h-4 w-4 ${hasSentLove ? 'fill-current' : ''}`} />
-              <span className="text-xs font-medium">
-                {type === "prayer" ? "Sending love" : "Sending strength"}
+              <span className="font-medium truncate">
+                {type === "prayer" ? "Love" : "Strength"}
               </span>
-              <span className="text-xs font-semibold">{loveCount}</span>
+              <span className="font-semibold">{loveCount}</span>
             </Button>
           </div>
 
           {/* Additional Actions */}
-          <div className="grid grid-cols-3 gap-1 sm:gap-2">
+          <div className="grid grid-cols-3 gap-2">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setShowComments(!showComments)}
-              className="flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-3 py-2.5 rounded-xl hover:text-primary hover:bg-primary/5 hover:shadow-sm transition-all text-xs"
+              className="flex items-center justify-center gap-1 px-2 py-2.5 rounded-xl hover:text-primary hover:bg-primary/5 hover:shadow-sm transition-all text-xs w-full"
             >
-              <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4" />
-              <span className="hidden sm:inline font-medium">Comment</span>
-              <span className="sm:hidden">💬</span>
+              <MessageCircle className="h-4 w-4" />
+              <span className="font-medium">Comment</span>
             </Button>
 
             <Button
               variant="ghost"
               size="sm"
               onClick={handleShare}
-              className="flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-3 py-2.5 rounded-xl hover:text-purple-600 hover:bg-purple-50 hover:shadow-sm transition-all text-xs"
+              className="flex items-center justify-center gap-1 px-2 py-2.5 rounded-xl hover:text-purple-600 hover:bg-purple-50 hover:shadow-sm transition-all text-xs w-full"
             >
-              <Share2 className="h-3 w-3 sm:h-4 sm:w-4" />
-              <span className="hidden sm:inline font-medium">Share</span>
-              <span className="sm:hidden">📤</span>
+              <Share2 className="h-4 w-4" />
+              <span className="font-medium">Share</span>
             </Button>
             
             <div className="relative">
@@ -316,11 +314,10 @@ export const PrayerCard = ({
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowGiftOptions(!showGiftOptions)}
-                className="flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-2.5 rounded-xl hover:text-emerald-600 hover:bg-emerald-50 hover:shadow-sm transition-all text-xs w-full"
+                className="flex items-center justify-center gap-1 px-2 py-2.5 rounded-xl hover:text-emerald-600 hover:bg-emerald-50 hover:shadow-sm transition-all text-xs w-full"
               >
-                <Gift className="h-3 w-3 sm:h-4 sm:w-4" />
-                <span className="hidden sm:inline font-medium">Send Gift</span>
-                <span className="sm:hidden">🎁</span>
+                <Gift className="h-4 w-4" />
+                <span className="font-medium">Gift</span>
               </Button>
               
               {showGiftOptions && (

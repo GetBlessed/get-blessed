@@ -286,67 +286,67 @@ export default function SharedPrayer() {
             </div>
             
             {/* Support Actions */}
-            <div className="space-y-3 sm:space-y-4 pt-4 border-t border-border/30">
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+            <div className="space-y-3 pt-4 border-t border-border/30">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={handleInteraction}
-                  className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl hover:text-primary hover:bg-primary/5 hover:shadow-sm transition-all"
+                  className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl hover:text-primary hover:bg-primary/5 hover:shadow-sm transition-all text-xs w-full"
                 >
                   <Heart className="h-4 w-4" />
-                  <span className="text-xs font-medium">
-                    {prayer.type === "prayer" ? "Here with you" : "Holding you in prayer"}
+                  <span className="font-medium truncate">
+                    {prayer.type === "prayer" ? "Here with you" : "Holding you"}
                   </span>
-                  <span className="text-xs font-semibold">{prayer.supportCount}</span>
+                  <span className="font-semibold">{prayer.supportCount}</span>
                 </Button>
                 
                 <Button
                   variant="ghost"
                   size="sm" 
                   onClick={handleInteraction}
-                  className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl hover:text-blue-600 hover:bg-blue-50 hover:shadow-sm transition-all"
+                  className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl hover:text-blue-600 hover:bg-blue-50 hover:shadow-sm transition-all text-xs w-full"
                 >
                   <Users className="h-4 w-4" />
-                  <span className="text-xs font-medium">
-                    {prayer.type === "prayer" ? "Praying with you" : "Cheering you on"}
+                  <span className="font-medium truncate">
+                    {prayer.type === "prayer" ? "Praying" : "Cheering"}
                   </span>
-                  <span className="text-xs font-semibold">{Math.floor(Math.random() * 15) + 5}</span>
+                  <span className="font-semibold">{Math.floor(Math.random() * 15) + 5}</span>
                 </Button>
                 
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={handleInteraction}
-                  className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl hover:text-pink-600 hover:bg-pink-50 hover:shadow-sm transition-all"
+                  className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl hover:text-pink-600 hover:bg-pink-50 hover:shadow-sm transition-all text-xs w-full"
                 >
                   <Send className="h-4 w-4" />
-                  <span className="text-xs font-medium">
-                    {prayer.type === "prayer" ? "Sending love" : "Sending strength"}
+                  <span className="font-medium truncate">
+                    {prayer.type === "prayer" ? "Love" : "Strength"}
                   </span>
-                  <span className="text-xs font-semibold">{Math.floor(Math.random() * 10) + 2}</span>
+                  <span className="font-semibold">{Math.floor(Math.random() * 10) + 2}</span>
                 </Button>
               </div>
 
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+              <div className="grid grid-cols-2 gap-2">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={handleInteraction}
-                  className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl hover:text-primary hover:bg-primary/5 hover:shadow-sm transition-all"
+                  className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl hover:text-primary hover:bg-primary/5 hover:shadow-sm transition-all text-xs w-full"
                 >
                   <MessageCircle className="h-4 w-4" />
-                  <span className="text-xs font-medium">Comment</span>
+                  <span className="font-medium">Comment</span>
                 </Button>
                 
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={handleInteraction}
-                  className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl hover:text-emerald-600 hover:bg-emerald-50 hover:shadow-sm transition-all"
+                  className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl hover:text-emerald-600 hover:bg-emerald-50 hover:shadow-sm transition-all text-xs w-full"
                 >
                   <Gift className="h-4 w-4" />
-                  <span className="text-xs font-medium">Send Gift</span>
+                  <span className="font-medium">Send Gift</span>
                 </Button>
               </div>
             </div>
