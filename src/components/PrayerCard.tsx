@@ -127,6 +127,12 @@ export const PrayerCard = ({
   };
 
   const handleShare = async () => {
+    console.log('=== SHARE FUNCTION CALLED ===');
+    console.log('Prayer data for sharing:', { 
+      id, content: content.substring(0, 50), type, author, anonymous, 
+      supportCount, timeAgo, category, urgent, onBehalfOf, organizationType, image 
+    });
+    
     // Encode prayer data in URL for cross-domain sharing
     const prayerData = {
       id,
@@ -138,17 +144,26 @@ export const PrayerCard = ({
       category,
       anonymous,
       urgent,
-      onBehalfOf,
+      onBehalfOf: onBehalfOf || "",
       organizationType,
-      image
+      image: image || undefined
     };
     
+    console.log('Prepared prayer data:', prayerData);
+    
     // Encode the prayer data as base64 URL parameter
-    const encodedData = btoa(JSON.stringify(prayerData));
+    const jsonString = JSON.stringify(prayerData);
+    console.log('JSON string length:', jsonString.length);
+    
+    const encodedData = btoa(jsonString);
+    console.log('Encoded data length:', encodedData.length);
+    console.log('Encoded data preview:', encodedData.substring(0, 100) + '...');
+    
     const shareUrl = `${window.location.origin}/${type}/${id}?data=${encodedData}`;
     const shareText = `Sharing a ${type} with you: ${shareUrl}`;
     
-    console.log('Share Debug:', { type, id, shareUrl, encodedData: encodedData.substring(0, 50) + '...' });
+    console.log('Final share URL:', shareUrl);
+    console.log('URL length:', shareUrl.length);
     
     try {
       await navigator.clipboard.writeText(shareText);
@@ -156,7 +171,9 @@ export const PrayerCard = ({
         title: "Link copied! 🔗",
         description: "Share this with others to spread the love.",
       });
+      console.log('Share URL copied to clipboard successfully');
     } catch (err) {
+      console.error('Clipboard API failed, using fallback:', err);
       // Fallback for browsers that don't support clipboard API
       const textArea = document.createElement('textarea');
       textArea.value = shareText;
@@ -169,7 +186,9 @@ export const PrayerCard = ({
         title: "Link copied! 🔗",
         description: "Share this with others to spread the love.",
       });
+      console.log('Share URL copied using fallback method');
     }
+    console.log('=== SHARE FUNCTION COMPLETED ===');
   };
 
   const getInitials = (name: string) => {
