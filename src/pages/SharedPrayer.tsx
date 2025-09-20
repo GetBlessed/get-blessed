@@ -145,14 +145,41 @@ export default function SharedPrayer() {
   const { toast } = useToast();
   const [showAuthModal, setShowAuthModal] = useState(false);
   
+  // Debug logging
+  console.log('SharedPrayer Debug:', { type, id, mockPrayers: Object.keys(mockPrayers) });
+  
   const prayer = mockPrayers[id as keyof typeof mockPrayers];
   
-  if (!prayer || prayer.type !== type) {
+  console.log('Found prayer:', prayer);
+  console.log('Prayer type matches URL type:', prayer?.type === type);
+  
+  if (!prayer) {
+    console.log('Prayer not found - ID not in mockPrayers');
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4">
         <div className="text-center space-y-4">
           <h1 className="text-2xl font-bold text-foreground">Prayer not found</h1>
           <p className="text-muted-foreground">This prayer or blessing may have been removed or the link is incorrect.</p>
+          <p className="text-sm text-muted-foreground">Debug: ID={id}, Type={type}</p>
+          <Link to="/">
+            <Button className="mt-4">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Go to Community
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (prayer.type !== type) {
+    console.log('Prayer type mismatch - prayer type:', prayer.type, 'URL type:', type);
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4">
+        <div className="text-center space-y-4">
+          <h1 className="text-2xl font-bold text-foreground">Prayer not found</h1>
+          <p className="text-muted-foreground">This prayer or blessing may have been removed or the link is incorrect.</p>
+          <p className="text-sm text-muted-foreground">Debug: Prayer type mismatch - Expected: {type}, Got: {prayer.type}</p>
           <Link to="/">
             <Button className="mt-4">
               <ArrowLeft className="w-4 h-4 mr-2" />
@@ -201,6 +228,10 @@ export default function SharedPrayer() {
           <p className="text-sm sm:text-base text-muted-foreground">
             Someone wanted to share this {prayer.type} with you
           </p>
+          <div className="mt-2 text-xs text-muted-foreground">
+            <Link to="/prayer/1" className="underline mr-4">Test Prayer Link</Link>
+            <Link to="/blessing/2" className="underline">Test Blessing Link</Link>
+          </div>
         </div>
 
         <Card className={`p-4 sm:p-6 transition-all duration-300 hover:shadow-medium rounded-2xl ${

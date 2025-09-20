@@ -130,6 +130,8 @@ export const PrayerCard = ({
     const shareUrl = `${window.location.origin}/${type}/${id}`;
     const shareText = `Sharing a ${type} with you: ${shareUrl}`;
     
+    console.log('Share Debug:', { type, id, shareUrl, shareText });
+    
     try {
       await navigator.clipboard.writeText(shareText);
       toast({

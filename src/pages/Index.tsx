@@ -403,6 +403,12 @@ const Index = () => {
             <Plus className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
             {showSubmission ? "Close" : "Share Your Heart"}
           </Button>
+          
+          {/* Debug Test Links */}
+          <div className="mt-4 flex flex-col sm:flex-row gap-2 sm:gap-4 justify-center text-xs">
+            <a href="/prayer/1" className="text-primary underline">Test Prayer Link (ID: 1)</a>
+            <a href="/blessing/2" className="text-primary underline">Test Blessing Link (ID: 2)</a>
+          </div>
         </div>
 
         {/* Prayer Submission Form */}
@@ -415,33 +421,33 @@ const Index = () => {
         {/* Community Feed with Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="text-center mb-4 sm:mb-6">
-            <TabsList className="grid w-full max-w-sm sm:max-w-md mx-auto grid-cols-2 bg-muted">
-              <TabsTrigger value="prayers" className="text-xs sm:text-sm font-medium py-2">
-                Submitted Prayers
+            <TabsList className="grid w-full max-w-xs sm:max-w-md mx-auto grid-cols-2 bg-muted h-10 sm:h-auto">
+              <TabsTrigger value="prayers" className="text-xs sm:text-sm font-medium py-2 px-2 sm:px-4">
+                Prayers
               </TabsTrigger>
-              <TabsTrigger value="blessings" className="text-xs sm:text-sm font-medium py-2">
-                Blessing Requests
+              <TabsTrigger value="blessings" className="text-xs sm:text-sm font-medium py-2 px-2 sm:px-4">
+                Blessings
               </TabsTrigger>
             </TabsList>
           </div>
 
           <TabsContent value="prayers" className="space-y-6">
             {/* Filter Tabs for Prayers */}
-            <div className="flex justify-center">
-              <div className="inline-flex rounded-lg border border-border/50 p-1 bg-muted/30">
+            <div className="flex justify-center mb-4 sm:mb-6">
+              <div className="inline-flex rounded-lg border border-border/50 p-0.5 sm:p-1 bg-muted/30 w-full max-w-sm sm:max-w-none sm:w-auto">
                 <Button
                   variant={activeFilter === "all" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setActiveFilter("all")}
-                  className="text-sm"
+                  className="text-xs sm:text-sm px-2 sm:px-4 py-1.5 sm:py-2 flex-1 sm:flex-initial"
                 >
-                  All Submitted
+                  All
                 </Button>
                 <Button
                   variant={activeFilter === "individual" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setActiveFilter("individual")}
-                  className="text-sm"
+                  className="text-xs sm:text-sm px-2 sm:px-4 py-1.5 sm:py-2 flex-1 sm:flex-initial"
                 >
                   Individual
                 </Button>
@@ -449,9 +455,9 @@ const Index = () => {
                   variant={activeFilter === "organization" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setActiveFilter("organization")}
-                  className="text-sm"
+                  className="text-xs sm:text-sm px-2 sm:px-4 py-1.5 sm:py-2 flex-1 sm:flex-initial"
                 >
-                  Groups & Organizations
+                  Organizations
                 </Button>
               </div>
             </div>
