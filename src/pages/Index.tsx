@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { PrayerCard } from "@/components/PrayerCard";
 import { PrayerSubmission } from "@/components/PrayerSubmission";
-import AuthModal from "@/components/AuthModal";
-import PostSubmissionAuthModal from "@/components/PostSubmissionAuthModal";
+// import AuthModal from "@/components/AuthModal"; // Hidden but kept for future use
+// import PostSubmissionAuthModal from "@/components/PostSubmissionAuthModal"; // Hidden but kept for future use
+import WaitlistModal from "@/components/WaitlistModal";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Heart, Users, User, Home, Gift } from "lucide-react";
@@ -161,8 +162,8 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState("prayers");
   const [activeFilter, setActiveFilter] = useState("all");
   const [currentView, setCurrentView] = useState("home");
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [showPostSubmissionAuth, setShowPostSubmissionAuth] = useState(false);
+  // const [showAuthModal, setShowAuthModal] = useState(false); // Hidden but kept for future use
+  const [showWaitlist, setShowWaitlist] = useState(false);
   const [user, setUser] = useState<{ name: string; email: string } | null>(null);
   const [stats] = useState({
     totalPrayers: 1247,
@@ -209,10 +210,8 @@ const Index = () => {
     console.log('New prayer has image:', !!prayer.image);
     console.log('Image length:', prayer.image?.length || 0);
     
-    // Show auth prompt after submission if user isn't logged in
-    if (!user) {
-      setShowPostSubmissionAuth(true);
-    }
+    // Show waitlist prompt after submission
+    setShowWaitlist(true);
 
     // Handle forwarding if email or phone provided
     if (newPrayer.forwardEmail || newPrayer.forwardPhone) {
@@ -230,33 +229,24 @@ const Index = () => {
     return typeFilter && organizationFilter;
   });
 
-  const handleLogin = (userData: { name: string; email: string }) => {
-    setUser(userData);
-    setShowPostSubmissionAuth(false);
-  };
+  // Hidden but kept for future use
+  // const handleLogin = (userData: { name: string; email: string }) => {
+  //   setUser(userData);
+  //   setShowWaitlist(false);
+  // };
 
-  const handleLogout = () => {
-    setUser(null);
-    setCurrentView("home");
-  };
+  // const handleLogout = () => {
+  //   setUser(null);
+  //   setCurrentView("home");
+  // };
 
-  const handlePostSubmissionSignUp = () => {
-    setShowPostSubmissionAuth(false);
-    setShowAuthModal(true);
-  };
-
-  const handlePostSubmissionSignIn = () => {
-    setShowPostSubmissionAuth(false);
-    setShowAuthModal(true);
-  };
-
-  const requireAuth = () => {
-    if (!user) {
-      setShowAuthModal(true);
-      return false;
-    }
-    return true;
-  };
+  // const requireAuth = () => {
+  //   if (!user) {
+  //     setShowWaitlist(true);
+  //     return false;
+  //   }
+  //   return true;
+  // };
 
   const renderMainNavigation = () => (
     <div className="bg-card border-b border-border/30 px-4 py-2">
@@ -276,9 +266,8 @@ const Index = () => {
             variant={currentView === "my-prayers" ? "default" : "ghost"}
             size="sm"
             onClick={() => {
-              if (requireAuth()) {
-                setCurrentView("my-prayers");
-              }
+              // Dashboard temporarily unavailable - show waitlist
+              setShowWaitlist(true);
             }}
             className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-xl font-medium text-xs sm:text-sm flex-1 sm:flex-initial"
           >
@@ -301,9 +290,10 @@ const Index = () => {
     </div>
   );
 
-  if (currentView === "my-prayers" && user) {
-    return <Dashboard user={user} onNavigateToHome={() => setCurrentView("home")} onLogout={handleLogout} />;
-  }
+  // Dashboard temporarily hidden
+  // if (currentView === "my-prayers" && user) {
+  //   return <Dashboard user={user} onNavigateToHome={() => setCurrentView("home")} onLogout={handleLogout} />;
+  // }
 
   if (currentView === "gifts") {
     return (
@@ -315,17 +305,18 @@ const Index = () => {
               <h1 className="text-xl font-bold text-primary">GetBlessed</h1>
               <span className="text-xs text-muted-foreground">• Connecting hearts through prayer</span>
             </div>
-            {user ? (
+            {/* Hidden for now - auth will be added later */}
+            {/* {user ? (
               <Button variant="outline" size="sm" className="flex items-center gap-2" onClick={handleLogout}>
                 <User className="h-4 w-4" />
                 {user.name} • Sign Out
               </Button>
             ) : (
-              <Button variant="outline" size="sm" className="flex items-center gap-2" onClick={() => setShowAuthModal(true)}>
+              <Button variant="outline" size="sm" className="flex items-center gap-2" onClick={() => setShowWaitlist(true)}>
                 <User className="h-4 w-4" />
-                Sign In
+                Join Waitlist
               </Button>
-            )}
+            )} */}
           </div>
         </nav>
 
@@ -358,17 +349,18 @@ const Index = () => {
             <h1 className="text-xl font-bold text-primary">GetBlessed</h1>
             <span className="text-xs text-muted-foreground">• Connecting hearts through prayer</span>
           </div>
-          {user ? (
+          {/* Hidden for now - auth will be added later */}
+          {/* {user ? (
             <Button variant="outline" size="sm" className="flex items-center gap-2" onClick={handleLogout}>
               <User className="h-4 w-4" />
               {user.name} • Sign Out
             </Button>
           ) : (
-            <Button variant="outline" size="sm" className="flex items-center gap-2" onClick={() => setShowAuthModal(true)}>
+            <Button variant="outline" size="sm" className="flex items-center gap-2" onClick={() => setShowWaitlist(true)}>
               <User className="h-4 w-4" />
-              Sign In
+              Join Waitlist
             </Button>
-          )}
+          )} */}
         </div>
       </nav>
 
@@ -563,20 +555,18 @@ const Index = () => {
         </div>
       </footer>
 
-      {/* Auth Modal */}
-      <AuthModal 
+      {/* Waitlist Modal */}
+      <WaitlistModal
+        isOpen={showWaitlist}
+        onClose={() => setShowWaitlist(false)}
+      />
+
+      {/* Auth Modal - Hidden but kept for future use */}
+      {/* <AuthModal 
         isOpen={showAuthModal} 
         onClose={() => setShowAuthModal(false)}
         onLogin={handleLogin}
-      />
-
-      {/* Post-Submission Auth Modal */}
-      <PostSubmissionAuthModal
-        isOpen={showPostSubmissionAuth}
-        onClose={() => setShowPostSubmissionAuth(false)}
-        onSignUp={handlePostSubmissionSignUp}
-        onSignIn={handlePostSubmissionSignIn}
-      />
+      /> */}
     </div>
   );
 };

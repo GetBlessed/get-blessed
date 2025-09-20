@@ -278,26 +278,25 @@ export const PrayerCard = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             {category && (
-              <div className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary-soft text-primary">
+              <div className="inline-flex items-center justify-center px-3 py-1.5 rounded-full text-xs font-medium bg-primary-soft text-primary min-w-[80px]">
                 {category}
               </div>
             )}
             {organizationType === "organization" ? (
-              <div className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
+              <div className="inline-flex items-center justify-center px-3 py-1.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100 min-w-[80px]">
                 Organization
               </div>
             ) : (
-              <div className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
+              <div className="inline-flex items-center justify-center px-3 py-1.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100 min-w-[80px]">
                 Individual
               </div>
             )}
+            {urgent && (
+              <div className="inline-flex items-center justify-center px-3 py-1.5 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-100 min-w-[80px]">
+                Urgent
+              </div>
+            )}
           </div>
-          {urgent && (
-            <div className="flex items-center gap-1 text-red-500">
-              <AlertCircle className="h-4 w-4" />
-              <span className="text-xs font-medium">Urgent</span>
-            </div>
-          )}
         </div>
         
         {/* Prayer Content */}
