@@ -127,7 +127,7 @@ export const PrayerCard = ({
   };
 
   const handleShare = async () => {
-    // Create simple, short share data
+    // Create simple, short share data - exclude image to prevent URL length issues
     const prayerData = {
       id,
       content,
@@ -140,7 +140,7 @@ export const PrayerCard = ({
       urgent,
       onBehalfOf: onBehalfOf || "",
       organizationType,
-      image
+      // Note: image excluded from URL to prevent length issues
     };
     
     // Create share URL with encoded data

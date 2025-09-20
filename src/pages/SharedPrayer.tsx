@@ -173,7 +173,16 @@ export default function SharedPrayer() {
     console.log('Current URL:', window.location.href);
     console.log('URL search params:', location.search);
     
-    // Check if prayer data is encoded in URL parameters (for cross-domain sharing)
+    // First try to get complete data from storage (includes images)
+    console.log('Trying storage first for complete data...');
+    const storedPrayer = getStoredPrayer(id);
+    if (storedPrayer) {
+      console.log('Found complete prayer in storage:', storedPrayer);
+      setPrayer(storedPrayer);
+      return;
+    }
+    
+    // If not in storage, check if prayer data is encoded in URL parameters
     const urlParams = new URLSearchParams(location.search);
     const encodedData = urlParams.get('data');
     
@@ -195,7 +204,7 @@ export default function SharedPrayer() {
           createdAt: new Date().toISOString() // Default createdAt
         };
         
-        console.log('Using URL prayer data');
+        console.log('Using URL prayer data (may lack image)');
         setPrayer(urlPrayer);
         return;
       } catch (error) {
@@ -204,29 +213,20 @@ export default function SharedPrayer() {
       }
     }
     
-    console.log('No valid URL data, trying storage...');
+    console.log('No valid storage or URL data, trying mock data...');
     
-    // First try to get from storage
-    const storedPrayer = getStoredPrayer(id);
-    if (storedPrayer) {
-      console.log('Found prayer in storage:', storedPrayer);
-      setPrayer(storedPrayer);
+    // Fall back to mock data
+    const mockPrayer = mockPrayers[id as keyof typeof mockPrayers];
+    if (mockPrayer) {
+      console.log('Found prayer in mock data:', mockPrayer);
+      setPrayer(mockPrayer);
     } else {
-      console.log('Not in storage, trying mock data...');
+      console.log('Prayer not found anywhere - ID not in storage, URL, or mock data');
       
-      // Fall back to mock data
-      const mockPrayer = mockPrayers[id as keyof typeof mockPrayers];
-      if (mockPrayer) {
-        console.log('Found prayer in mock data:', mockPrayer);
-        setPrayer(mockPrayer);
-      } else {
-        console.log('Prayer not found anywhere - ID not in storage or mock data');
-        
-        // Debug storage contents
-        debugStorageContents();
-        
-        setPrayer(null);
-      }
+      // Debug storage contents
+      debugStorageContents();
+      
+      setPrayer(null);
     }
     console.log('=== SHARED PRAYER LOADING COMPLETE ===');
   }, [id, location.search]);
