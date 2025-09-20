@@ -192,7 +192,7 @@ export const PrayerCard = ({
         </div>
         
         {/* Prayer Content */}
-        <p className="text-foreground leading-relaxed font-medium">
+        <p className="text-foreground leading-relaxed font-medium break-words hyphens-auto overflow-wrap-anywhere">
           {content}
         </p>
 
@@ -288,25 +288,27 @@ export const PrayerCard = ({
           </div>
 
           {/* Additional Actions */}
-          <div className="flex items-center justify-between gap-2">
+          <div className="grid grid-cols-3 gap-1 sm:gap-2">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setShowComments(!showComments)}
-              className="flex items-center gap-2 px-3 py-2.5 rounded-xl hover:text-primary hover:bg-primary/5 hover:shadow-sm transition-all"
+              className="flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-3 py-2.5 rounded-xl hover:text-primary hover:bg-primary/5 hover:shadow-sm transition-all text-xs"
             >
-              <MessageCircle className="h-4 w-4" />
-              <span className="text-xs font-medium">Comment</span>
+              <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline font-medium">Comment</span>
+              <span className="sm:hidden">💬</span>
             </Button>
 
             <Button
               variant="ghost"
               size="sm"
               onClick={handleShare}
-              className="flex items-center gap-2 px-3 py-2.5 rounded-xl hover:text-purple-600 hover:bg-purple-50 hover:shadow-sm transition-all"
+              className="flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-3 py-2.5 rounded-xl hover:text-purple-600 hover:bg-purple-50 hover:shadow-sm transition-all text-xs"
             >
-              <Share2 className="h-4 w-4" />
-              <span className="text-xs font-medium">Share</span>
+              <Share2 className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline font-medium">Share</span>
+              <span className="sm:hidden">📤</span>
             </Button>
             
             <div className="relative">
@@ -314,10 +316,11 @@ export const PrayerCard = ({
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowGiftOptions(!showGiftOptions)}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl hover:text-emerald-600 hover:bg-emerald-50 hover:shadow-sm transition-all"
+                className="flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-2.5 rounded-xl hover:text-emerald-600 hover:bg-emerald-50 hover:shadow-sm transition-all text-xs w-full"
               >
-                <Gift className="h-4 w-4" />
-                <span className="text-xs font-medium">Send Gift</span>
+                <Gift className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline font-medium">Send Gift</span>
+                <span className="sm:hidden">🎁</span>
               </Button>
               
               {showGiftOptions && (

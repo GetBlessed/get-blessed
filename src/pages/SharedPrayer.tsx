@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Heart, MessageCircle, Users, Send, Gift, AlertCircle, ArrowLeft } from "lucide-react";
@@ -141,12 +141,16 @@ const mockPrayers = {
 };
 
 export default function SharedPrayer() {
-  const { type, id } = useParams();
+  const { id } = useParams();
+  const location = useLocation();
   const { toast } = useToast();
   const [showAuthModal, setShowAuthModal] = useState(false);
   
+  // Extract type from pathname
+  const type = location.pathname.startsWith('/blessing/') ? 'blessing' : 'prayer';
+  
   // Debug logging
-  console.log('SharedPrayer Debug:', { type, id, mockPrayers: Object.keys(mockPrayers) });
+  console.log('SharedPrayer Debug:', { type, id, pathname: location.pathname, mockPrayers: Object.keys(mockPrayers) });
   
   const prayer = mockPrayers[id as keyof typeof mockPrayers];
   
@@ -261,7 +265,7 @@ export default function SharedPrayer() {
             </div>
             
             {/* Prayer Content */}
-            <p className="text-foreground leading-relaxed font-medium text-base sm:text-lg">
+            <p className="text-foreground leading-relaxed font-medium text-base sm:text-lg break-words hyphens-auto overflow-wrap-anywhere">
               {prayer.content}
             </p>
             

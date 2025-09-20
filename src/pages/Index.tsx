@@ -365,11 +365,11 @@ const Index = () => {
 
       {/* Hero Header */}
       <header className="bg-gradient-hero text-primary-foreground py-8 sm:py-12 px-4">
-        <div className="max-w-4xl mx-auto text-center space-y-4 sm:space-y-6">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-semibold tracking-tight">
+        <div className="max-w-4xl mx-auto text-center space-y-4 sm:space-y-6 px-2">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-semibold tracking-tight break-words">
             Welcome to GetBlessed
           </h1>
-          <p className="text-base sm:text-lg lg:text-xl opacity-90 max-w-2xl mx-auto leading-relaxed px-4">
+          <p className="text-base sm:text-lg lg:text-xl opacity-90 max-w-2xl mx-auto leading-relaxed px-2 break-words">
             A community where hearts connect through prayer and blessing. 
             Submit prayers to lift others up, ask for blessings when you need support.
           </p>
