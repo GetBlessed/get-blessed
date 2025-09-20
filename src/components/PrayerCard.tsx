@@ -131,7 +131,7 @@ export const PrayerCard = ({
     console.log('Prayer ID:', id);
     console.log('Image present:', !!image);
     
-    // Always store the complete prayer in localStorage for sharing
+    // Create complete prayer data including image
     const prayerData = {
       id,
       content,
@@ -144,21 +144,18 @@ export const PrayerCard = ({
       urgent,
       onBehalfOf: onBehalfOf || "",
       organizationType,
-      image,
-      createdAt: new Date().toISOString()
+      image
     };
     
-    // Store in localStorage so shared links can access complete data
+    // Always store complete prayer in localStorage for sharing (with image)
     try {
       const storedPrayers = JSON.parse(localStorage.getItem('getblessed_prayers') || '[]');
       const existingIndex = storedPrayers.findIndex((p: any) => p.id === id);
       
       if (existingIndex >= 0) {
-        // Update existing prayer
-        storedPrayers[existingIndex] = prayerData;
+        storedPrayers[existingIndex] = { ...prayerData, createdAt: new Date().toISOString() };
       } else {
-        // Add new prayer
-        storedPrayers.unshift(prayerData);
+        storedPrayers.unshift({ ...prayerData, createdAt: new Date().toISOString() });
       }
       
       localStorage.setItem('getblessed_prayers', JSON.stringify(storedPrayers));
@@ -167,10 +164,18 @@ export const PrayerCard = ({
       console.error('Error storing prayer for sharing:', error);
     }
     
-    // Create simple share URL (no data encoding needed)
-    const shareUrl = `${window.location.origin}/${type}/${id}`;
-    console.log('Share URL created:', shareUrl);
-    console.log('=== SHARING DEBUG END ===');
+    // Create share URL with fallback data (smaller, without image)
+    let shareUrl: string;
+    try {
+      const fallbackData = { ...prayerData };
+      delete fallbackData.image; // Remove image to keep URL shorter
+      const encodedData = btoa(JSON.stringify(fallbackData));
+      shareUrl = `${window.location.origin}/${type}/${id}?data=${encodedData}`;
+      console.log('Share URL created with fallback data');
+    } catch (error) {
+      console.error('Error creating share URL:', error);
+      shareUrl = `${window.location.origin}/${type}/${id}`;
+    }
     
     // Simple, reliable clipboard copy
     const copyToClipboard = async (text: string) => {
@@ -221,27 +226,9 @@ export const PrayerCard = ({
         description: shareUrl.length > 50 ? shareUrl.substring(0, 50) + "..." : shareUrl,
         duration: 10000,
       });
-      
-      // Also try to select the URL if displayed somewhere
-      setTimeout(() => {
-        const urlText = shareUrl;
-        if (window.getSelection) {
-          const selection = window.getSelection();
-          const range = document.createRange();
-          const span = document.createElement('span');
-          span.textContent = urlText;
-          span.style.position = 'fixed';
-          span.style.top = '0';
-          span.style.left = '0';
-          span.style.opacity = '0.01';
-          document.body.appendChild(span);
-          range.selectNodeContents(span);
-          selection?.removeAllRanges();
-          selection?.addRange(range);
-          setTimeout(() => document.body.removeChild(span), 1000);
-        }
-      }, 100);
     }
+    
+    console.log('=== SHARING DEBUG END ===');
   };
 
   const getInitials = (name: string) => {
