@@ -403,12 +403,6 @@ const Index = () => {
             <Plus className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
             {showSubmission ? "Close" : "Share Your Heart"}
           </Button>
-          
-          {/* Debug Test Links */}
-          <div className="mt-4 flex flex-col sm:flex-row gap-2 sm:gap-4 justify-center text-xs">
-            <a href="/prayer/1" className="text-primary underline">Test Prayer Link (ID: 1)</a>
-            <a href="/blessing/2" className="text-primary underline">Test Blessing Link (ID: 2)</a>
-          </div>
         </div>
 
         {/* Prayer Submission Form */}

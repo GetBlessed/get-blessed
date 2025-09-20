@@ -232,10 +232,6 @@ export default function SharedPrayer() {
           <p className="text-sm sm:text-base text-muted-foreground">
             Someone wanted to share this {prayer.type} with you
           </p>
-          <div className="mt-2 text-xs text-muted-foreground">
-            <Link to="/prayer/1" className="underline mr-4">Test Prayer Link</Link>
-            <Link to="/blessing/2" className="underline">Test Blessing Link</Link>
-          </div>
         </div>
 
         <Card className={`p-4 sm:p-6 transition-all duration-300 hover:shadow-medium rounded-2xl ${
