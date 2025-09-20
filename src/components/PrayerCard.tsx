@@ -163,14 +163,17 @@ export const PrayerCard = ({
       console.log('JSON string length:', jsonString.length);
       
       // Try with image first if it's not too large
-      if (jsonString.length < 3000) { // Conservative limit for JSON before encoding
+      if (jsonString.length <= 2000) { // Conservative limit for JSON with image
         try {
-          const encodedData = btoa(unescape(encodeURIComponent(jsonString)));
-          const testUrl = `${window.location.origin}/${type}/${id}?data=${encodeURIComponent(encodedData)}`;
+          // Simple base64 encoding that works reliably with emojis
+          const encodedData = btoa(jsonString);
+          console.log('Base64 encoded length:', encodedData.length);
+          
+          const testUrl = `${window.location.origin}/${type}/${id}?data=${encodedData}`;
           console.log('Test URL length with image:', testUrl.length);
           
-          // More conservative URL length limit
-          if (testUrl.length <= 1200) {
+          // Conservative URL length limit
+          if (testUrl.length <= 1500) {
             shareUrl = testUrl;
             console.log('Final URL (with image):', shareUrl.substring(0, 100) + '...');
           } else {
@@ -191,8 +194,8 @@ export const PrayerCard = ({
       
       try {
         const jsonStringNoImage = JSON.stringify(prayerDataNoImage);
-        const encodedDataNoImage = btoa(unescape(encodeURIComponent(jsonStringNoImage)));
-        shareUrl = `${window.location.origin}/${type}/${id}?data=${encodeURIComponent(encodedDataNoImage)}`;
+        const encodedDataNoImage = btoa(jsonStringNoImage);
+        shareUrl = `${window.location.origin}/${type}/${id}?data=${encodedDataNoImage}`;
         includesImage = false;
         console.log('Final URL (no image):', shareUrl.substring(0, 100) + '...');
       } catch (e) {

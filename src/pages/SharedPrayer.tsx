@@ -5,7 +5,7 @@ import { Heart, MessageCircle, Users, Send, Gift, AlertCircle, ArrowLeft } from 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { AuthModal } from "@/components/AuthModal";
+import { WaitlistModal } from "@/components/WaitlistModal";
 import { Link } from "react-router-dom";
 import { getStoredPrayer, type StoredPrayer } from "@/utils/prayerStorage";
 import { debugStorageContents } from "@/utils/debugStorage";
@@ -158,7 +158,7 @@ export default function SharedPrayer() {
   const { id } = useParams();
   const location = useLocation();
   const { toast } = useToast();
-  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showWaitlistModal, setShowWaitlistModal] = useState(false);
   const [prayer, setPrayer] = useState<StoredPrayer | null>(null);
   
   // Extract type from pathname
@@ -191,12 +191,12 @@ export default function SharedPrayer() {
     if (encodedData) {
       try {
         console.log('Attempting to decode URL data...');
-        // Use proper decoding for better emoji/special character handling
-        const decodedString = decodeURIComponent(escape(atob(decodeURIComponent(encodedData))));
-        console.log('Decoded string length:', decodedString.length);
-        console.log('Decoded string preview:', decodedString.substring(0, 100));
+        // Simple base64 decoding with proper UTF-8 handling
+        const jsonString = atob(encodedData);
+        console.log('Decoded string length:', jsonString.length);
+        console.log('Decoded string preview:', jsonString.substring(0, 100));
         
-        const decodedData = JSON.parse(decodedString);
+        const decodedData = JSON.parse(jsonString);
         console.log('Successfully parsed prayer data from URL:');
         console.log('- Has image:', !!decodedData.image);
         console.log('- Image length:', decodedData.image?.length || 0);
@@ -208,28 +208,12 @@ export default function SharedPrayer() {
           createdAt: new Date().toISOString() // Default createdAt
         };
         
-        console.log('Using URL prayer data with proper encoding');
+        console.log('Using URL prayer data');
         setPrayer(urlPrayer);
         return;
       } catch (error) {
         console.error('Error decoding URL prayer data:', error);
         console.error('Encoded data that failed:', encodedData?.substring(0, 100));
-        
-        // Try fallback decoding method
-        try {
-          console.log('Trying fallback decoding method...');
-          const fallbackDecoded = atob(encodedData);
-          const fallbackData = JSON.parse(fallbackDecoded);
-          const urlPrayer: StoredPrayer = {
-            ...fallbackData,
-            createdAt: new Date().toISOString()
-          };
-          console.log('Fallback decoding successful');
-          setPrayer(urlPrayer);
-          return;
-        } catch (fallbackError) {
-          console.error('Fallback decoding also failed:', fallbackError);
-        }
       }
     }
     
@@ -293,7 +277,7 @@ export default function SharedPrayer() {
   }
 
   const handleInteraction = () => {
-    setShowAuthModal(true);
+    setShowWaitlistModal(true);
   };
 
   const getInitials = (name: string) => {
@@ -468,7 +452,7 @@ export default function SharedPrayer() {
               <p className="text-sm text-muted-foreground">
                 Share your prayers, offer blessings, and connect with a supportive community.
               </p>
-              <Button onClick={() => setShowAuthModal(true)} className="w-full">
+              <Button onClick={() => setShowWaitlistModal(true)} className="w-full">
                 Join Community
               </Button>
             </div>
@@ -476,11 +460,10 @@ export default function SharedPrayer() {
         </Card>
       </div>
 
-      {/* Auth Modal */}
-      <AuthModal 
-        isOpen={showAuthModal} 
-        onClose={() => setShowAuthModal(false)}
-        onLogin={() => setShowAuthModal(false)}
+      {/* Waitlist Modal */}
+      <WaitlistModal 
+        isOpen={showWaitlistModal} 
+        onClose={() => setShowWaitlistModal(false)}
       />
     </div>
   );
