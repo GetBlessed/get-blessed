@@ -127,7 +127,7 @@ export const PrayerCard = ({
   };
 
   const handleShare = async () => {
-    // Create simple, short share data - exclude image to prevent URL length issues
+    // Create complete prayer data including image
     const prayerData = {
       id,
       content,
@@ -140,12 +140,35 @@ export const PrayerCard = ({
       urgent,
       onBehalfOf: onBehalfOf || "",
       organizationType,
-      // Note: image excluded from URL to prevent length issues
+      image
     };
     
-    // Create share URL with encoded data
-    const encodedData = btoa(JSON.stringify(prayerData));
-    const shareUrl = `${window.location.origin}/${type}/${id}?data=${encodedData}`;
+    // Try to create URL with image first
+    let shareUrl: string;
+    let includesImage = true;
+    
+    try {
+      const encodedData = btoa(JSON.stringify(prayerData));
+      const testUrl = `${window.location.origin}/${type}/${id}?data=${encodedData}`;
+      
+      // Check if URL is too long (typical browser limit is ~2000 chars)
+      if (testUrl.length > 1800) {
+        console.log('URL too long with image, creating without image');
+        // Create version without image
+        const prayerDataNoImage = { ...prayerData };
+        delete prayerDataNoImage.image;
+        const encodedDataNoImage = btoa(JSON.stringify(prayerDataNoImage));
+        shareUrl = `${window.location.origin}/${type}/${id}?data=${encodedDataNoImage}`;
+        includesImage = false;
+      } else {
+        shareUrl = testUrl;
+      }
+    } catch (error) {
+      console.error('Error creating share URL:', error);
+      // Fallback to simple URL without data
+      shareUrl = `${window.location.origin}/${type}/${id}`;
+      includesImage = false;
+    }
     
     // Simple, reliable clipboard copy
     const copyToClipboard = async (text: string) => {
@@ -187,7 +210,9 @@ export const PrayerCard = ({
     if (success) {
       toast({
         title: "Link copied! 🔗",
-        description: "Share this with others to spread the love.",
+        description: includesImage 
+          ? "Share this with others to spread the love." 
+          : "Link copied (image too large for sharing URL).",
       });
     } else {
       // Final fallback - show the URL
