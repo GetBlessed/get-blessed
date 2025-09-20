@@ -127,6 +127,11 @@ export const PrayerCard = ({
   };
 
   const handleShare = async () => {
+    console.log('=== SHARING DEBUG START ===');
+    console.log('Prayer ID:', id);
+    console.log('Image present:', !!image);
+    console.log('Image length:', image?.length || 0);
+    
     // Create complete prayer data including image
     const prayerData = {
       id,
@@ -143,8 +148,50 @@ export const PrayerCard = ({
       image
     };
     
+    console.log('Prayer data created:', {
+      ...prayerData,
+      image: prayerData.image ? `${prayerData.image.substring(0, 50)}...` : 'none'
+    });
+    
+    // Try to create URL with image first
+    let shareUrl: string;
+    let includesImage = true;
+    
+    try {
+      const encodedData = btoa(JSON.stringify(prayerData));
+      console.log('Encoded data length:', encodedData.length);
+      
+      const testUrl = `${window.location.origin}/${type}/${id}?data=${encodedData}`;
+      console.log('Test URL length:', testUrl.length);
+      
+      // Check if URL is too long (typical browser limit is ~2000 chars)
+      if (testUrl.length > 1800) {
+        console.log('URL too long with image, creating without image');
+        // Create version without image
+        const prayerDataNoImage = { ...prayerData };
+        delete prayerDataNoImage.image;
+        const encodedDataNoImage = btoa(JSON.stringify(prayerDataNoImage));
+        shareUrl = `${window.location.origin}/${type}/${id}?data=${encodedDataNoImage}`;
+        includesImage = false;
+        console.log('Final URL (no image):', shareUrl);
+      } else {
+        shareUrl = testUrl;
+        console.log('Final URL (with image):', shareUrl);
+      }
+    } catch (error) {
+      console.error('Error creating share URL:', error);
+      // Fallback to simple URL without data
+      shareUrl = `${window.location.origin}/${type}/${id}`;
+      includesImage = false;
+      console.log('Fallback URL:', shareUrl);
+    }
+    
+    console.log('Includes image in URL:', includesImage);
+    console.log('=== SHARING DEBUG END ===');
+    
     // Simple, reliable clipboard copy
     const copyToClipboard = async (text: string) => {
+      // Method 1: Modern clipboard API (if available and secure)
       if (navigator.clipboard && window.isSecureContext) {
         try {
           await navigator.clipboard.writeText(text);
@@ -154,6 +201,7 @@ export const PrayerCard = ({
         }
       }
       
+      // Method 2: Selection + execCommand (most reliable)
       try {
         const textarea = document.createElement('textarea');
         textarea.value = text;
@@ -174,34 +222,44 @@ export const PrayerCard = ({
         return false;
       }
     };
-
-    try {
-      // Try to include image in URL
-      const encodedData = btoa(JSON.stringify(prayerData));
-      const shareUrl = `${window.location.origin}/${type}/${id}?data=${encodedData}`;
-      
-      // Try to copy regardless of URL length
-      const success = await copyToClipboard(`Sharing a ${type} with you: ${shareUrl}`);
-      
-      if (success) {
-        toast({
-          title: "Link copied! 🔗",
-          description: image ? "Share this with others (includes image)." : "Share this with others to spread the love.",
-        });
-      } else {
-        toast({
-          title: "Copy this link manually:",
-          description: shareUrl.length > 50 ? shareUrl.substring(0, 50) + "..." : shareUrl,
-          duration: 10000,
-        });
-      }
-    } catch (error) {
-      console.error('Error creating share URL:', error);
+    
+    // Try to copy
+    const success = await copyToClipboard(`Sharing a ${type} with you: ${shareUrl}`);
+    
+    if (success) {
       toast({
-        title: "Error creating share link",
-        description: "Please try again.",
-        variant: "destructive",
+        title: "Link copied! 🔗",
+        description: includesImage 
+          ? "Share this with others to spread the love." 
+          : "Link copied (image too large for sharing URL).",
       });
+    } else {
+      // Final fallback - show the URL
+      toast({
+        title: "Copy this link manually:",
+        description: shareUrl.length > 50 ? shareUrl.substring(0, 50) + "..." : shareUrl,
+        duration: 10000,
+      });
+      
+      // Also try to select the URL if displayed somewhere
+      setTimeout(() => {
+        const urlText = shareUrl;
+        if (window.getSelection) {
+          const selection = window.getSelection();
+          const range = document.createRange();
+          const span = document.createElement('span');
+          span.textContent = urlText;
+          span.style.position = 'fixed';
+          span.style.top = '0';
+          span.style.left = '0';
+          span.style.opacity = '0.01';
+          document.body.appendChild(span);
+          range.selectNodeContents(span);
+          selection?.removeAllRanges();
+          selection?.addRange(range);
+          setTimeout(() => document.body.removeChild(span), 1000);
+        }
+      }, 100);
     }
   };
 

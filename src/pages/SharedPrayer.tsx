@@ -173,7 +173,16 @@ export default function SharedPrayer() {
     console.log('Current URL:', window.location.href);
     console.log('URL search params:', location.search);
     
-    // Check if prayer data is encoded in URL parameters first (most reliable for sharing)
+    // First try to get complete data from storage (includes images)
+    console.log('Trying storage first for complete data...');
+    const storedPrayer = getStoredPrayer(id);
+    if (storedPrayer) {
+      console.log('Found complete prayer in storage:', storedPrayer);
+      setPrayer(storedPrayer);
+      return;
+    }
+    
+    // If not in storage, check if prayer data is encoded in URL parameters
     const urlParams = new URLSearchParams(location.search);
     const encodedData = urlParams.get('data');
     
@@ -183,43 +192,43 @@ export default function SharedPrayer() {
       try {
         console.log('Attempting to decode URL data...');
         const decodedString = atob(encodedData);
+        console.log('Decoded string length:', decodedString.length);
+        console.log('Decoded string preview:', decodedString.substring(0, 100));
+        
         const decodedData = JSON.parse(decodedString);
         console.log('Successfully parsed prayer data from URL:');
         console.log('- Has image:', !!decodedData.image);
+        console.log('- Image length:', decodedData.image?.length || 0);
         console.log('- Content preview:', decodedData.content?.substring(0, 50));
         
         // Convert to StoredPrayer format
         const urlPrayer: StoredPrayer = {
           ...decodedData,
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString() // Default createdAt
         };
         
-        console.log('Using URL prayer data');
+        console.log('Using URL prayer data (may lack image)');
         setPrayer(urlPrayer);
         return;
       } catch (error) {
         console.error('Error decoding URL prayer data:', error);
+        console.error('Encoded data that failed:', encodedData);
       }
     }
-
-    // Try storage as fallback
-    console.log('No URL data, trying storage...');
-    const storedPrayer = getStoredPrayer(id);
-    if (storedPrayer) {
-      console.log('Found complete prayer in storage with image:', !!storedPrayer.image);
-      setPrayer(storedPrayer);
-      return;
-    }
     
-    // Final fallback to mock data
-    console.log('No storage data, trying mock data...');
+    console.log('No valid storage or URL data, trying mock data...');
+    
+    // Fall back to mock data
     const mockPrayer = mockPrayers[id as keyof typeof mockPrayers];
     if (mockPrayer) {
       console.log('Found prayer in mock data:', mockPrayer);
       setPrayer(mockPrayer);
     } else {
-      console.log('Prayer not found anywhere');
+      console.log('Prayer not found anywhere - ID not in storage, URL, or mock data');
+      
+      // Debug storage contents
       debugStorageContents();
+      
       setPrayer(null);
     }
     console.log('=== SHARED PRAYER LOADING COMPLETE ===');
