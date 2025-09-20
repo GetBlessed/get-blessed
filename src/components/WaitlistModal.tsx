@@ -74,8 +74,9 @@ export const WaitlistModal = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-      <Card className="w-full max-w-md bg-card border shadow-elevated rounded-2xl overflow-hidden my-4">
+    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 overflow-y-auto">
+      <div className="min-h-full flex items-center justify-center p-4 py-8">
+        <Card className="w-full max-w-md bg-card border shadow-elevated rounded-2xl overflow-hidden relative">
         <div className="relative bg-gradient-primary text-primary-foreground p-6">
           <Button
             variant="ghost"
@@ -173,7 +174,8 @@ export const WaitlistModal = ({
             </p>
           </div>
         </div>
-      </Card>
+        </Card>
+      </div>
     </div>
   );
 };
