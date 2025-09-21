@@ -514,6 +514,143 @@ export const addToWaitlist = async (data: {
   }
 };
 
+// Sign up a new user with Supabase Auth
+export const signUpUser = async (data: {
+  email: string;
+  password: string;
+  name: string;
+  nickname?: string;
+  phone?: string;
+  organization?: string;
+}): Promise<{ user: any; error: string | null }> => {
+  const supabase = createSupabaseClient();
+
+  try {
+    // Sign up with Supabase Auth
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email: data.email,
+      password: data.password,
+      options: {
+        data: {
+          name: data.name,
+          nickname: data.nickname,
+          phone: data.phone,
+          organization: data.organization,
+        },
+      },
+    });
+
+    if (authError) {
+      console.error("Error signing up with auth:", authError);
+
+      // Provide more user-friendly error messages
+      let errorMessage = authError.message;
+
+      if (errorMessage.includes("invalid") && errorMessage.includes("email")) {
+        errorMessage = "Please enter a valid email address. Check for typos in the domain name.";
+      } else if (errorMessage.includes("already registered")) {
+        errorMessage = "This email is already registered. Please sign in instead.";
+      }
+
+      return { user: null, error: errorMessage };
+    }
+
+    if (!authData.user) {
+      return { user: null, error: "Failed to create user account" };
+    }
+
+    // Create user profile in our users table
+    const { error: profileError } = await supabase
+      .from('users')
+      .insert({
+        id: authData.user.id,
+        email: data.email,
+        name: data.name,
+        nickname: data.nickname || null,
+        phone: data.phone || null,
+        organization: data.organization || null,
+      });
+
+    if (profileError) {
+      console.error("Error creating user profile:", profileError);
+      // Note: Auth user was created but profile wasn't - might need cleanup
+      return { user: authData.user, error: "Account created but profile setup failed" };
+    }
+
+    return { user: authData.user, error: null };
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : "Unknown error occurred";
+    console.error("Unexpected error during signup:", err);
+    return { user: null, error: errorMessage };
+  }
+};
+
+// Sign in an existing user
+export const signInUser = async (data: {
+  email: string;
+  password: string;
+}): Promise<{ user: any; error: string | null }> => {
+  const supabase = createSupabaseClient();
+
+  try {
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      email: data.email,
+      password: data.password,
+    });
+
+    if (authError) {
+      console.error("Error signing in:", authError);
+      return { user: null, error: authError.message };
+    }
+
+    return { user: authData.user, error: null };
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : "Unknown error occurred";
+    console.error("Unexpected error during signin:", err);
+    return { user: null, error: errorMessage };
+  }
+};
+
+// Sign out the current user
+export const signOutUser = async (): Promise<{ error: string | null }> => {
+  const supabase = createSupabaseClient();
+
+  try {
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.error("Error signing out:", error);
+      return { error: error.message };
+    }
+
+    return { error: null };
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : "Unknown error occurred";
+    console.error("Unexpected error during signout:", err);
+    return { error: errorMessage };
+  }
+};
+
+// Get current user session
+export const getCurrentUser = async (): Promise<{ user: any; error: string | null }> => {
+  const supabase = createSupabaseClient();
+
+  try {
+    const { data: { user }, error } = await supabase.auth.getUser();
+
+    if (error) {
+      console.error("Error getting current user:", error);
+      return { user: null, error: error.message };
+    }
+
+    return { user, error: null };
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : "Unknown error occurred";
+    console.error("Unexpected error getting current user:", err);
+    return { user: null, error: errorMessage };
+  }
+};
+
 // Helper function to format time ago using date-fns
 function formatTimeAgo(createdAt: string): string {
   return formatDistanceToNow(new Date(createdAt), { addSuffix: true });

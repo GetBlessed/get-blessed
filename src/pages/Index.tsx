@@ -4,7 +4,8 @@ import { PrayerCard } from "@/components/PrayerCard";
 import { PrayerSubmission } from "@/components/PrayerSubmission";
 // import AuthModal from "@/components/AuthModal"; // Hidden but kept for future use
 // import PostSubmissionAuthModal from "@/components/PostSubmissionAuthModal"; // Hidden but kept for future use
-import WaitlistModal from "@/components/WaitlistModal";
+import SignupModal from "@/components/SignupModal";
+import { UserMenu } from "@/components/UserMenu";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Heart, Users, Gift, Loader2 } from "lucide-react";
@@ -21,7 +22,7 @@ const Index = () => {
   const [activeFilter, setActiveFilter] = useState("all");
   const [currentView, setCurrentView] = useState("home");
   // const [showAuthModal, setShowAuthModal] = useState(false); // Hidden but kept for future use
-  const [showWaitlist, setShowWaitlist] = useState(false);
+  const [showSignup, setShowSignup] = useState(false);
   const [stats] = useState({
     totalPrayers: 1247,
     totalBlessings: 892,
@@ -111,7 +112,7 @@ const Index = () => {
       toast.success(prayer.type === 'prayer' ? 'Prayer shared with the community!' : 'Blessing request shared!');
 
       // Show waitlist prompt after submission
-      setShowWaitlist(true);
+      setShowSignup(true);
 
       // Handle forwarding if email or phone provided
       if (newPrayer.forwardEmail || newPrayer.forwardPhone) {
@@ -137,7 +138,7 @@ const Index = () => {
   // Hidden but kept for future use
   // const handleLogin = (userData: { name: string; email: string }) => {
   //   setUser(userData);
-  //   setShowWaitlist(false);
+  //   setShowSignup(false);
   // };
 
   // const handleLogout = () => {
@@ -147,7 +148,7 @@ const Index = () => {
 
   // const requireAuth = () => {
   //   if (!user) {
-  //     setShowWaitlist(true);
+  //     setShowSignup(true);
   //     return false;
   //   }
   //   return true;
@@ -172,7 +173,7 @@ const Index = () => {
             size="sm"
             onClick={() => {
               // Dashboard temporarily unavailable - show waitlist
-              setShowWaitlist(true);
+              setShowSignup(true);
             }}
             className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-xl font-medium text-xs sm:text-sm flex-1 sm:flex-initial"
           >
@@ -185,7 +186,7 @@ const Index = () => {
             size="sm"
             onClick={() => {
               // Gifts temporarily unavailable - show waitlist
-              setShowWaitlist(true);
+              setShowSignup(true);
             }}
             className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-xl font-medium text-xs sm:text-sm flex-1 sm:flex-initial"
           >
@@ -213,18 +214,7 @@ const Index = () => {
             <h1 className="text-xl font-bold text-primary">GetBlessed</h1>
             <span className="text-xs text-muted-foreground">• Connecting hearts through prayer</span>
           </div>
-          {/* Hidden for now - auth will be added later */}
-          {/* {user ? (
-            <Button variant="outline" size="sm" className="flex items-center gap-2" onClick={handleLogout}>
-              <User className="h-4 w-4" />
-              {user.name} • Sign Out
-            </Button>
-          ) : (
-            <Button variant="outline" size="sm" className="flex items-center gap-2" onClick={() => setShowWaitlist(true)}>
-              <User className="h-4 w-4" />
-              Join Waitlist
-            </Button>
-          )} */}
+          <UserMenu />
         </div>
       </nav>
 
@@ -464,9 +454,13 @@ const Index = () => {
       </footer>
 
       {/* Waitlist Modal */}
-      <WaitlistModal
-        isOpen={showWaitlist}
-        onClose={() => setShowWaitlist(false)}
+      <SignupModal
+        isOpen={showSignup}
+        onClose={() => setShowSignup(false)}
+        onSuccess={(user) => {
+          console.log('User signed up:', user);
+          // You can add additional logic here when a user successfully signs up
+        }}
       />
 
       {/* Auth Modal - Hidden but kept for future use */}

@@ -5,7 +5,8 @@ import { Heart, MessageCircle, Users, Send, Gift, AlertCircle, ArrowLeft } from 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState, useEffect } from "react";
 // import { useToast } from "@/hooks/use-toast"; // Unused - kept for future use
-import WaitlistModal from "@/components/WaitlistModal";
+import SignupModal from "@/components/SignupModal";
+import { UserMenu } from "@/components/UserMenu";
 import { Link } from "react-router-dom";
 import { getStoredPrayer, type StoredPrayer } from "@/utils/prayerStorage";
 
@@ -318,17 +319,20 @@ export default function SharedPrayer() {
       {/* Header */}
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
-          <div className="flex items-center gap-2 sm:gap-4">
-            <Link to="/">
-              <Button variant="ghost" size="sm" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
-                <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">Back to Community</span>
-                <span className="sm:hidden">Back</span>
-              </Button>
-            </Link>
-            <div className="text-xs sm:text-sm text-muted-foreground">
-              Shared {prayer.type}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 sm:gap-4">
+              <Link to="/">
+                <Button variant="ghost" size="sm" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+                  <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Back to Community</span>
+                  <span className="sm:hidden">Back</span>
+                </Button>
+              </Link>
+              <div className="text-xs sm:text-sm text-muted-foreground">
+                Shared {prayer.type}
+              </div>
             </div>
+            <UserMenu />
           </div>
         </div>
       </div>
@@ -490,9 +494,12 @@ export default function SharedPrayer() {
       </div>
 
       {/* Waitlist Modal */}
-      <WaitlistModal
+      <SignupModal
         isOpen={showWaitlist}
         onClose={() => setShowWaitlist(false)}
+        onSuccess={(user) => {
+          console.log('User signed up:', user);
+        }}
       />
     </div>
   );
