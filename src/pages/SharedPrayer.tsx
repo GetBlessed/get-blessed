@@ -8,7 +8,6 @@ import { useToast } from "@/hooks/use-toast";
 import WaitlistModal from "@/components/WaitlistModal";
 import { Link } from "react-router-dom";
 import { getStoredPrayer, type StoredPrayer } from "@/utils/prayerStorage";
-import { debugStorageContents } from "@/utils/debugStorage";
 
 // Fallback mock data for prayers that don't exist in storage
 const mockPrayers: Record<string, StoredPrayer> = {
@@ -235,10 +234,6 @@ export default function SharedPrayer() {
           setPrayer(mockPrayer);
         } else {
           console.log('Prayer not found anywhere - ID not in storage, URL, or mock data');
-
-          // Debug storage contents
-          debugStorageContents();
-
           setPrayer(null);
           setError('Prayer not found');
         }
