@@ -237,10 +237,6 @@ export const addPrayerLike = async (
       return { data: false, error: supportError.message };
     }
 
-    // We no longer need to increment count - it's dynamic now
-    // Just return success since the like was created
-
-    // No longer need this error handling for increment
 
     return { data: true, error: null };
   } catch (err) {
