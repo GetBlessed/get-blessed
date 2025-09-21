@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { X, Heart, CheckCircle, Mail } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { addToWaitlist } from "@/lib/supabase/prayers";
 
 interface WaitlistModalProps {
   isOpen: boolean;
@@ -46,11 +47,16 @@ export const WaitlistModal = ({
     }
 
     setIsSubmitting(true);
-    
+
     try {
-      // Simulate API call to add to waitlist
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      // Save to Supabase waitlist table
+      await addToWaitlist({
+        email: email.trim(),
+        name: name.trim(),
+        phone: phone.trim() || undefined,
+        organization: organization.trim() || undefined,
+      });
+
       toast({
         title: "You're on the list! 🎉",
         description: "We'll notify you when new features are available.",
@@ -63,9 +69,16 @@ export const WaitlistModal = ({
       setOrganization("");
       onClose();
     } catch (error) {
+      console.error('Error adding to waitlist:', error);
+
+      // Check if it's a duplicate email error
+      const errorMessage = error instanceof Error && error.message.includes('already on the waitlist')
+        ? "This email is already on the waitlist!"
+        : "Please try again in a moment.";
+
       toast({
         title: "Something went wrong",
-        description: "Please try again in a moment.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

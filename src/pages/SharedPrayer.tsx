@@ -4,11 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Heart, MessageCircle, Users, Send, Gift, AlertCircle, ArrowLeft } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState, useEffect } from "react";
-import { useToast } from "@/hooks/use-toast";
+// import { useToast } from "@/hooks/use-toast"; // Unused - kept for future use
 import WaitlistModal from "@/components/WaitlistModal";
 import { Link } from "react-router-dom";
 import { getStoredPrayer, type StoredPrayer } from "@/utils/prayerStorage";
-import { debugStorageContents } from "@/utils/debugStorage";
 
 // Fallback mock data for prayers that don't exist in storage
 const mockPrayers: Record<string, StoredPrayer> = {
@@ -157,93 +156,124 @@ const mockPrayers: Record<string, StoredPrayer> = {
 export default function SharedPrayer() {
   const { id } = useParams();
   const location = useLocation();
-  const { toast } = useToast();
+  // const { toast } = useToast(); // Unused - kept for future use
   const [showWaitlist, setShowWaitlist] = useState(false);
   const [prayer, setPrayer] = useState<StoredPrayer | null>(null);
-  
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   // Extract type from pathname
   const type = location.pathname.startsWith('/blessing/') ? 'blessing' : 'prayer';
-  
+
   // Load prayer data on component mount
   useEffect(() => {
     if (!id) return;
-    
-    console.log('=== SHARED PRAYER LOADING ===');
-    console.log('Prayer ID:', id, 'Type:', type);
-    console.log('Current URL:', window.location.href);
-    console.log('URL search params:', location.search);
-    
-    // First try to get complete data from storage (includes images)
-    console.log('Trying storage first for complete data...');
-    const storedPrayer = getStoredPrayer(id);
-    if (storedPrayer) {
-      console.log('Found complete prayer in storage:', storedPrayer);
-      setPrayer(storedPrayer);
-      return;
-    }
-    
-    // If not in storage, check if prayer data is encoded in URL parameters
-    const urlParams = new URLSearchParams(location.search);
-    const encodedData = urlParams.get('data');
-    
-    console.log('Encoded data from URL:', encodedData ? `${encodedData.length} chars` : 'None');
-    
-    if (encodedData) {
+
+    const loadPrayer = async () => {
+      console.log('=== SHARED PRAYER LOADING ===');
+      console.log('Prayer ID:', id, 'Type:', type);
+      console.log('Current URL:', window.location.href);
+      console.log('URL search params:', location.search);
+
+      setIsLoading(true);
+      setError(null);
+
       try {
-        console.log('Attempting to decode URL data...');
-        const decodedString = atob(encodedData);
-        console.log('Decoded string length:', decodedString.length);
-        console.log('Decoded string preview:', decodedString.substring(0, 100));
-        
-        const decodedData = JSON.parse(decodedString);
-        console.log('Successfully parsed prayer data from URL:');
-        console.log('- Has image:', !!decodedData.image);
-        console.log('- Image length:', decodedData.image?.length || 0);
-        console.log('- Content preview:', decodedData.content?.substring(0, 50));
-        
-        // Convert to StoredPrayer format
-        const urlPrayer: StoredPrayer = {
-          ...decodedData,
-          createdAt: new Date().toISOString() // Default createdAt
-        };
-        
-        console.log('Using URL prayer data (may lack image)');
-        setPrayer(urlPrayer);
-        return;
-      } catch (error) {
-        console.error('Error decoding URL prayer data:', error);
-        console.error('Encoded data that failed:', encodedData);
+        // First try to get complete data from Supabase storage (includes images)
+        console.log('Trying Supabase storage first for complete data...');
+        const storedPrayer = await getStoredPrayer(id);
+        if (storedPrayer) {
+          console.log('Found complete prayer in Supabase storage:', storedPrayer);
+          setPrayer(storedPrayer);
+          setIsLoading(false);
+          return;
+        }
+    
+        // If not in storage, check if prayer data is encoded in URL parameters
+        console.log('Not found in Supabase, checking URL parameters...');
+        const urlParams = new URLSearchParams(location.search);
+        const encodedData = urlParams.get('data');
+
+        console.log('Encoded data from URL:', encodedData ? `${encodedData.length} chars` : 'None');
+
+        if (encodedData) {
+          try {
+            console.log('Attempting to decode URL data...');
+            const decodedString = atob(encodedData);
+            console.log('Decoded string length:', decodedString.length);
+            console.log('Decoded string preview:', decodedString.substring(0, 100));
+
+            const decodedData = JSON.parse(decodedString);
+            console.log('Successfully parsed prayer data from URL:');
+            console.log('- Has image:', !!decodedData.image);
+            console.log('- Image length:', decodedData.image?.length || 0);
+            console.log('- Content preview:', decodedData.content?.substring(0, 50));
+
+            // Convert to StoredPrayer format
+            const urlPrayer: StoredPrayer = {
+              ...decodedData,
+              createdAt: new Date().toISOString() // Default createdAt
+            };
+
+            console.log('Using URL prayer data');
+            setPrayer(urlPrayer);
+            setIsLoading(false);
+            return;
+          } catch (urlError) {
+            console.error('Error decoding URL prayer data:', urlError);
+            console.error('Encoded data that failed:', encodedData);
+          }
+        }
+
+        console.log('No valid storage or URL data, trying mock data...');
+
+        // Fall back to mock data
+        const mockPrayer = mockPrayers[id as keyof typeof mockPrayers];
+        if (mockPrayer) {
+          console.log('Found prayer in mock data:', mockPrayer);
+          setPrayer(mockPrayer);
+        } else {
+          console.log('Prayer not found anywhere - ID not in storage, URL, or mock data');
+          setPrayer(null);
+          setError('Prayer not found');
+        }
+      } catch (loadError) {
+        console.error('Error loading prayer:', loadError);
+        setError(loadError instanceof Error ? loadError.message : 'Failed to load prayer');
+      } finally {
+        setIsLoading(false);
       }
-    }
-    
-    console.log('No valid storage or URL data, trying mock data...');
-    
-    // Fall back to mock data
-    const mockPrayer = mockPrayers[id as keyof typeof mockPrayers];
-    if (mockPrayer) {
-      console.log('Found prayer in mock data:', mockPrayer);
-      setPrayer(mockPrayer);
-    } else {
-      console.log('Prayer not found anywhere - ID not in storage, URL, or mock data');
-      
-      // Debug storage contents
-      debugStorageContents();
-      
-      setPrayer(null);
-    }
-    console.log('=== SHARED PRAYER LOADING COMPLETE ===');
+
+      console.log('=== SHARED PRAYER LOADING COMPLETE ===');
+    };
+
+    loadPrayer();
   }, [id, location.search]);
   
   // Debug logging
-  console.log('SharedPrayer Debug:', { type, id, pathname: location.pathname, prayerFound: !!prayer });
-  
-  if (!prayer) {
-    console.log('Prayer not found - ID not in storage or mock data');
+  console.log('SharedPrayer Debug:', { type, id, pathname: location.pathname, prayerFound: !!prayer, isLoading, error });
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent mx-auto"></div>
+          <h1 className="text-xl font-semibold text-foreground">Loading prayer...</h1>
+          <p className="text-muted-foreground">Please wait while we fetch the prayer.</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error || !prayer) {
+    console.log('Prayer not found or error occurred - ID not in storage or mock data');
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4">
         <div className="text-center space-y-4">
           <h1 className="text-2xl font-bold text-foreground">Prayer not found</h1>
-          <p className="text-muted-foreground">This prayer or blessing may have been removed or the link is incorrect.</p>
+          <p className="text-muted-foreground">{error || 'This prayer or blessing may have been removed or the link is incorrect.'}</p>
           <p className="text-sm text-muted-foreground">Debug: ID={id}, Type={type}</p>
           <Link to="/">
             <Button className="mt-4">
