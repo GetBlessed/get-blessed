@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { PrayerCard } from "@/components/PrayerCard";
 import { PrayerSubmission } from "@/components/PrayerSubmission";
 // import AuthModal from "@/components/AuthModal"; // Hidden but kept for future use
@@ -6,11 +7,13 @@ import { PrayerSubmission } from "@/components/PrayerSubmission";
 import WaitlistModal from "@/components/WaitlistModal";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Heart, Users, User, Home, Gift } from "lucide-react";
+import { Plus, Heart, Users, User, Home, Gift, Loader2 } from "lucide-react";
 import Dashboard from "./Dashboard";
-import { getStoredPrayers, storePrayer, initializePrayerStorage, type StoredPrayer } from "@/utils/prayerStorage";
+import { getStoredPrayers, storePrayer, initializePrayerStorageAsync, type StoredPrayer } from "@/utils/prayerStorage";
+import { subscribeToPrayers } from "@/lib/supabase/prayers";
+import { toast } from "sonner";
 
-interface Prayer extends StoredPrayer {}
+// Remove empty interface - using StoredPrayer directly
 
 // Default prayers for initialization
 const defaultPrayers: StoredPrayer[] = [
@@ -157,7 +160,7 @@ const defaultPrayers: StoredPrayer[] = [
 ];
 
 const Index = () => {
-  const [prayers, setPrayers] = useState<StoredPrayer[]>([]);
+  const queryClient = useQueryClient();
   const [showSubmission, setShowSubmission] = useState(false);
   const [activeTab, setActiveTab] = useState("prayers");
   const [activeFilter, setActiveFilter] = useState("all");
@@ -171,13 +174,64 @@ const Index = () => {
     activeCommunity: 3421
   });
 
-  // Initialize prayers from storage on component mount
-  useEffect(() => {
-    initializePrayerStorage(defaultPrayers);
-    setPrayers(getStoredPrayers());
-  }, []);
+  // Fetch prayers using React Query with async function
+  const {
+    data: prayers = [],
+    isLoading,
+    isError,
+    error
+  } = useQuery({
+    queryKey: ['prayers'],
+    queryFn: async () => {
+      console.log('React Query: Fetching prayers from Supabase...');
+      const result = await getStoredPrayers();
+      console.log('React Query: Fetched', result.length, 'prayers');
+      return result;
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
+    retry: 3, // Retry failed requests
+  });
 
-  const handleNewPrayer = (newPrayer: {
+  // Initialize prayers and set up real-time subscription
+  useEffect(() => {
+    // Initialize prayers asynchronously
+    const initializePrayers = async () => {
+      try {
+        await initializePrayerStorageAsync(defaultPrayers);
+        // Invalidate and refetch prayers after initialization
+        queryClient.invalidateQueries({ queryKey: ['prayers'] });
+      } catch (error) {
+        console.error('Error initializing prayers:', error);
+        toast.error('Failed to load prayers. Please refresh the page.');
+      }
+    };
+
+    initializePrayers();
+
+    // Set up real-time subscription
+    const unsubscribe = subscribeToPrayers((payload) => {
+      console.log('Real-time prayer update:', payload);
+
+      if (payload.eventType === 'INSERT') {
+        // Invalidate queries to refetch data
+        queryClient.invalidateQueries({ queryKey: ['prayers'] });
+        toast.success('New prayer added to the community!');
+      } else if (payload.eventType === 'UPDATE') {
+        // Update specific prayer in cache
+        queryClient.invalidateQueries({ queryKey: ['prayers'] });
+      } else if (payload.eventType === 'DELETE') {
+        // Remove prayer from cache
+        queryClient.invalidateQueries({ queryKey: ['prayers'] });
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [queryClient]);
+
+  const handleNewPrayer = async (newPrayer: {
     content: string;
     type: "prayer" | "blessing";
     category: string;
@@ -192,31 +246,44 @@ const Index = () => {
     image?: string;
   }) => {
     const prayer: StoredPrayer = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       ...newPrayer,
       supportCount: 0,
       timeAgo: "Just now",
       createdAt: new Date().toISOString()
     };
-    
+
     console.log('Creating new prayer:', prayer.id, prayer.type, prayer.content.substring(0, 50));
-    
-    // Store the prayer and update state
-    storePrayer(prayer);
-    setPrayers(prev => [prayer, ...prev]);
-    setShowSubmission(false);
 
-    console.log('Prayer stored and state updated');
-    console.log('New prayer has image:', !!prayer.image);
-    console.log('Image length:', prayer.image?.length || 0);
-    
-    // Show waitlist prompt after submission
-    setShowWaitlist(true);
+    try {
+      // Store the prayer using the async function
+      const savedPrayer = await storePrayer(prayer);
+      console.log('Prayer stored successfully:', savedPrayer.id);
 
-    // Handle forwarding if email or phone provided
-    if (newPrayer.forwardEmail || newPrayer.forwardPhone) {
-      // In real implementation, this would send the prayer via email/SMS
-      console.log(`Forwarding to: ${newPrayer.forwardEmail || newPrayer.forwardPhone}`);
+      // Invalidate queries to refetch fresh data
+      queryClient.invalidateQueries({ queryKey: ['prayers'] });
+
+      setShowSubmission(false);
+
+      console.log('Prayer stored and queries invalidated');
+      console.log('New prayer has image:', !!prayer.image);
+      console.log('Image length:', prayer.image?.length || 0);
+
+      // Show success toast
+      toast.success(prayer.type === 'prayer' ? 'Prayer shared with the community!' : 'Blessing request shared!');
+
+      // Show waitlist prompt after submission
+      setShowWaitlist(true);
+
+      // Handle forwarding if email or phone provided
+      if (newPrayer.forwardEmail || newPrayer.forwardPhone) {
+        // In real implementation, this would send the prayer via email/SMS
+        console.log(`Forwarding to: ${newPrayer.forwardEmail || newPrayer.forwardPhone}`);
+        toast.success('Prayer forwarded successfully!');
+      }
+    } catch (error) {
+      console.error('Error saving prayer:', error);
+      toast.error('Failed to save prayer. Please try again.');
     }
   };
 
@@ -420,12 +487,34 @@ const Index = () => {
             </div>
 
             <div className="space-y-6">
-              {filteredPrayers.map((prayer) => (
-                <PrayerCard
-                  key={prayer.id}
-                  {...prayer}
-                />
-              ))}
+              {isLoading ? (
+                <div className="flex flex-col items-center justify-center py-8 space-y-4">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  <p className="text-muted-foreground">Loading prayers...</p>
+                </div>
+              ) : isError ? (
+                <div className="flex flex-col items-center justify-center py-8 space-y-4">
+                  <p className="text-destructive">Failed to load prayers</p>
+                  <Button
+                    onClick={() => queryClient.invalidateQueries({ queryKey: ['prayers'] })}
+                    variant="outline"
+                    size="sm"
+                  >
+                    Try Again
+                  </Button>
+                </div>
+              ) : filteredPrayers.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground">No prayers found in this category.</p>
+                </div>
+              ) : (
+                filteredPrayers.map((prayer) => (
+                  <PrayerCard
+                    key={prayer.id}
+                    {...prayer}
+                  />
+                ))
+              )}
             </div>
           </TabsContent>
 
@@ -462,12 +551,34 @@ const Index = () => {
             </div>
 
             <div className="space-y-6">
-              {filteredPrayers.map((prayer) => (
-                <PrayerCard
-                  key={prayer.id}
-                  {...prayer}
-                />
-              ))}
+              {isLoading ? (
+                <div className="flex flex-col items-center justify-center py-8 space-y-4">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  <p className="text-muted-foreground">Loading blessings...</p>
+                </div>
+              ) : isError ? (
+                <div className="flex flex-col items-center justify-center py-8 space-y-4">
+                  <p className="text-destructive">Failed to load blessings</p>
+                  <Button
+                    onClick={() => queryClient.invalidateQueries({ queryKey: ['prayers'] })}
+                    variant="outline"
+                    size="sm"
+                  >
+                    Try Again
+                  </Button>
+                </div>
+              ) : filteredPrayers.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground">No blessings found in this category.</p>
+                </div>
+              ) : (
+                filteredPrayers.map((prayer) => (
+                  <PrayerCard
+                    key={prayer.id}
+                    {...prayer}
+                  />
+                ))
+              )}
             </div>
           </TabsContent>
         </Tabs>
