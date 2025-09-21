@@ -485,6 +485,33 @@ export const subscribeToPrayerSupport = (
   };
 };
 
+// Add to waitlist
+export const addToWaitlist = async (data: {
+  email: string;
+  name: string;
+  phone?: string;
+  organization?: string;
+}): Promise<void> => {
+  const supabase = createSupabaseClient();
+
+  const { error } = await supabase
+    .from('waitlist')
+    .insert({
+      email: data.email,
+      name: data.name,
+      phone: data.phone || null,
+      organization: data.organization || null,
+    });
+
+  if (error) {
+    if (error.code === '23505') {
+      throw new Error('This email is already on the waitlist');
+    }
+    console.error('Error adding to waitlist:', error);
+    throw new Error(`Failed to add to waitlist: ${error.message}`);
+  }
+};
+
 // Helper function to format time ago using date-fns
 function formatTimeAgo(createdAt: string): string {
   return formatDistanceToNow(new Date(createdAt), { addSuffix: true });
