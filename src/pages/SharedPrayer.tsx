@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Heart, MessageCircle, Users, Send, Gift, AlertCircle, ArrowLeft } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState, useEffect } from "react";
-import { useToast } from "@/hooks/use-toast";
+// import { useToast } from "@/hooks/use-toast"; // Unused - kept for future use
 import WaitlistModal from "@/components/WaitlistModal";
 import { Link } from "react-router-dom";
 import { getStoredPrayer, type StoredPrayer } from "@/utils/prayerStorage";
@@ -156,7 +156,7 @@ const mockPrayers: Record<string, StoredPrayer> = {
 export default function SharedPrayer() {
   const { id } = useParams();
   const location = useLocation();
-  const { toast } = useToast();
+  // const { toast } = useToast(); // Unused - kept for future use
   const [showWaitlist, setShowWaitlist] = useState(false);
   const [prayer, setPrayer] = useState<StoredPrayer | null>(null);
   const [isLoading, setIsLoading] = useState(true);

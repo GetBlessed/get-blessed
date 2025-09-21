@@ -32,7 +32,7 @@ src/
 │       └── database.types.ts  # Generated TypeScript types
 ├── hooks/           # Custom React hooks
 └── utils/           # Helper functions and utilities
-    └── prayerStorage.ts  # Prayer storage with Supabase/localStorage fallback
+    └── prayerStorage.ts  # Prayer storage wrapper for Supabase operations
 ```
 
 ## Database Schema (Supabase)
@@ -139,8 +139,8 @@ import { getStoredPrayers } from "@/utils/prayerStorage";
 ### State Management
 - Use local component state for UI-specific state
 - Use TanStack Query for server state and data fetching
-- `prayerStorage.ts` provides Supabase operations with localStorage fallback
-- All prayers/blessings stored in Supabase (localStorage is backup only)
+- `prayerStorage.ts` provides clean Supabase operations interface
+- All prayers/blessings stored exclusively in Supabase (no localStorage)
 
 ### Form Handling
 - Use React Hook Form for all forms
@@ -209,7 +209,7 @@ import { getStoredPrayers } from "@/utils/prayerStorage";
 - **Database**: Fully integrated with Supabase
   - All prayers/blessings stored in PostgreSQL
   - Real-time updates working
-  - localStorage used as fallback only
+  - No localStorage usage - Supabase only
 - **Current Limitations**:
   - No user accounts yet (all `user_id = NULL`)
   - No RLS policies (disabled for development)
