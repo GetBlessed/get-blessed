@@ -29,7 +29,7 @@ export interface Prayer {
   updated_at: string;
 }
 
-export interface PrayerSupport {
+export interface PrayerLike {
   id: string;
   prayer_id: string;
   user_id?: string;
@@ -57,7 +57,7 @@ export interface DatabasePrayer {
   updated_at: string;
 }
 
-export interface DatabasePrayerSupport {
+export interface DatabasePrayerLike {
   id: string;
   prayer_id: string;
   user_id: string | null;
@@ -81,7 +81,7 @@ export interface CreatePrayerInput {
   user_id?: string;
 }
 
-export interface CreatePrayerSupportInput {
+export interface CreatePrayerLikeInput {
   prayer_id: string;
   user_id?: string;
   supporter_name?: string;

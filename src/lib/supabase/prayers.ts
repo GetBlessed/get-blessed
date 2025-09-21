@@ -3,11 +3,11 @@ import { formatDistanceToNow } from "date-fns";
 import type { StoredPrayer } from '@/utils/prayerStorage';
 import type {
   Prayer,
-  PrayerSupport,
+  PrayerLike,
   DatabasePrayer,
-  DatabasePrayerSupport,
+  DatabasePrayerLike,
   CreatePrayerInput,
-  CreatePrayerSupportInput,
+  CreatePrayerLikeInput,
   TransformedPrayer,
 } from "./types";
 
@@ -25,7 +25,10 @@ export const fetchPrayers = async (): Promise<StoredPrayer[]> => {
 
   const { data, error } = await supabase
     .from('prayers')
-    .select('*')
+    .select(`
+      *,
+      likes_count:prayer_likes(count)
+    `)
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -39,7 +42,7 @@ export const fetchPrayers = async (): Promise<StoredPrayer[]> => {
     content: prayer.content,
     type: prayer.type,
     author: prayer.author_name,
-    supportCount: prayer.support_count || 0,
+    supportCount: prayer.likes_count?.[0]?.count || 0,
     timeAgo: formatTimeAgo(prayer.created_at),
     category: prayer.category,
     anonymous: prayer.anonymous,
@@ -58,7 +61,10 @@ export const fetchPrayer = async (id: string): Promise<StoredPrayer | null> => {
 
   const { data, error } = await supabase
     .from('prayers')
-    .select('*')
+    .select(`
+      *,
+      likes_count:prayer_likes(count)
+    `)
     .eq('id', id)
     .single();
 
@@ -77,7 +83,7 @@ export const fetchPrayer = async (id: string): Promise<StoredPrayer | null> => {
     content: data.content,
     type: data.type,
     author: data.author_name,
-    supportCount: data.support_count || 0,
+    supportCount: data.likes_count?.[0]?.count || 0,
     timeAgo: formatTimeAgo(data.created_at),
     category: data.category,
     anonymous: data.anonymous,
@@ -85,7 +91,7 @@ export const fetchPrayer = async (id: string): Promise<StoredPrayer | null> => {
     onBehalfOf: data.on_behalf_of || '',
     organizationType: data.organization_type,
     scripture: data.scripture || '',
-    image: data.image || '',
+    image: data.image_url || '',
     createdAt: data.created_at,
   };
 };
@@ -100,7 +106,6 @@ export const insertPrayer = async (prayer: PrayerInsert): Promise<StoredPrayer> 
     content: prayer.content,
     type: prayer.type,
     author_name: prayer.author,
-    support_count: prayer.supportCount || 0,
     category: prayer.category,
     anonymous: prayer.anonymous,
     urgent: prayer.urgent,
@@ -129,7 +134,7 @@ export const insertPrayer = async (prayer: PrayerInsert): Promise<StoredPrayer> 
     content: data.content,
     type: data.type,
     author: data.author_name,
-    supportCount: data.support_count || 0,
+    supportCount: data.likes_count?.[0]?.count || 0,
     timeAgo: formatTimeAgo(data.created_at),
     category: data.category,
     anonymous: data.anonymous,
@@ -151,7 +156,6 @@ export const updatePrayer = async (id: string, updates: PrayerUpdate): Promise<S
   if (updates.content !== undefined) updateData.content = updates.content;
   if (updates.type !== undefined) updateData.type = updates.type;
   if (updates.author !== undefined) updateData.author_name = updates.author;
-  if (updates.supportCount !== undefined) updateData.support_count = updates.supportCount;
   if (updates.category !== undefined) updateData.category = updates.category;
   if (updates.anonymous !== undefined) updateData.anonymous = updates.anonymous;
   if (updates.urgent !== undefined) updateData.urgent = updates.urgent;
@@ -164,7 +168,10 @@ export const updatePrayer = async (id: string, updates: PrayerUpdate): Promise<S
     .from('prayers')
     .update(updateData)
     .eq('id', id)
-    .select()
+    .select(`
+      *,
+      likes_count:prayer_likes(count)
+    `)
     .single();
 
   if (error) {
@@ -178,7 +185,7 @@ export const updatePrayer = async (id: string, updates: PrayerUpdate): Promise<S
     content: data.content,
     type: data.type,
     author: data.author_name,
-    supportCount: data.support_count || 0,
+    supportCount: data.likes_count?.[0]?.count || 0,
     timeAgo: formatTimeAgo(data.created_at),
     category: data.category,
     anonymous: data.anonymous,
@@ -206,69 +213,62 @@ export const deletePrayer = async (id: string): Promise<void> => {
   }
 };
 
-// Add support to a prayer (increment support count and create support record)
-export const addPrayerSupport = async (
-  supportData: CreatePrayerSupportInput
+// Add a like to a prayer
+export const addPrayerLike = async (
+  likeData: CreatePrayerLikeInput
 ): Promise<{ data: boolean; error: string | null }> => {
   try {
     const supabase = createSupabaseClient();
 
-    // Start a transaction by creating the support record first
+    // Start a transaction by creating the like record first
     const { data: support, error: supportError } = await supabase
-      .from("prayer_support")
+      .from("prayer_likes")
       .insert({
-        prayer_id: supportData.prayer_id,
-        user_id: supportData.user_id || null,
-        supporter_name: supportData.supporter_name || null,
-        anonymous: supportData.anonymous ?? false,
+        prayer_id: likeData.prayer_id,
+        user_id: likeData.user_id || null,
+        supporter_name: likeData.supporter_name || null,
+        anonymous: likeData.anonymous ?? false,
       })
       .select()
       .single();
 
     if (supportError) {
-      console.error("Error creating prayer support:", supportError);
+      console.error("Error creating prayer like:", supportError);
       return { data: false, error: supportError.message };
     }
 
-    // Then increment the support count
-    const { error: updateError } = await supabase.rpc("increment_prayer_support", {
-      prayer_id: supportData.prayer_id,
-    });
+    // We no longer need to increment count - it's dynamic now
+    // Just return success since the like was created
 
-    if (updateError) {
-      console.error("Error incrementing prayer support count:", updateError);
-      // Try to rollback the support record creation
-      await supabase.from("prayer_support").delete().eq("id", support.id);
-      return { data: false, error: updateError.message };
-    }
+    // No longer need this error handling for increment
 
     return { data: true, error: null };
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : "Unknown error occurred";
-    console.error("Unexpected error adding prayer support:", err);
+    console.error("Unexpected error adding prayer like:", err);
     return { data: false, error: errorMessage };
   }
 };
 
-// Get prayer support records for a specific prayer
-export const getPrayerSupport = async (
+// Get prayer like records for a specific prayer
+export const getPrayerLikes = async (
   prayerId: string
-): Promise<{ data: PrayerSupport[] | null; error: string | null }> => {
+): Promise<{ data: PrayerLike[] | null; error: string | null }> => {
   try {
     const supabase = createSupabaseClient();
 
     const { data, error } = await supabase
-      .from("prayer_support")
+      .from("prayer_likes")
       .select("*")
       .eq("prayer_id", prayerId)
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.error("Error fetching prayer support:", error);
+      console.error("Error fetching prayer likes:", error);
       return { data: null, error: error.message };
     }
 
-    const supportRecords: PrayerSupport[] = data?.map((record: DatabasePrayerSupport) => ({
+    const likeRecords: PrayerLike[] = data?.map((record: DatabasePrayerLike) => ({
       id: record.id,
       prayer_id: record.prayer_id,
       user_id: record.user_id || undefined,
@@ -277,10 +277,10 @@ export const getPrayerSupport = async (
       created_at: record.created_at,
     })) || [];
 
-    return { data: supportRecords, error: null };
+    return { data: likeRecords, error: null };
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : "Unknown error occurred";
-    console.error("Unexpected error fetching prayer support:", err);
+    console.error("Unexpected error fetching prayer likes:", err);
     return { data: null, error: errorMessage };
   }
 };
@@ -351,7 +351,10 @@ export const getPrayersByUserId = async (
 
     const { data, error } = await supabase
       .from("prayers")
-      .select("*")
+      .select(`
+        *,
+        likes_count:prayer_likes(count)
+      `)
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
       .range(offset, offset + limit - 1);
@@ -366,7 +369,7 @@ export const getPrayersByUserId = async (
       content: prayer.content,
       type: prayer.type,
       author: prayer.author_name,
-      supportCount: prayer.support_count || 0,
+      supportCount: prayer.likes_count?.[0]?.count || 0,
       timeAgo: formatTimeAgo(prayer.created_at),
       category: prayer.category,
       anonymous: prayer.anonymous,
@@ -396,7 +399,10 @@ export const searchPrayers = async (
 
     const { data, error } = await supabase
       .from("prayers")
-      .select("*")
+      .select(`
+        *,
+        likes_count:prayer_likes(count)
+      `)
       .or(`content.ilike.%${query}%, category.ilike.%${query}%`)
       .order("created_at", { ascending: false })
       .limit(limit);
@@ -411,7 +417,7 @@ export const searchPrayers = async (
       content: prayer.content,
       type: prayer.type,
       author: prayer.author_name,
-      supportCount: prayer.support_count || 0,
+      supportCount: prayer.likes_count?.[0]?.count || 0,
       timeAgo: formatTimeAgo(prayer.created_at),
       category: prayer.category,
       anonymous: prayer.anonymous,
@@ -457,23 +463,23 @@ export const subscribeToPrayers = (callback: (payload: Record<string, any>) => v
   };
 };
 
-// Subscribe to real-time prayer support updates
-export const subscribeToPrayerSupport = (
+// Subscribe to real-time prayer likes updates
+export const subscribeToPrayerLikes = (
   callback: (payload: Record<string, any>) => void
 ): (() => void) => {
   const supabase = createSupabaseClient();
 
   const subscription = supabase
-    .channel("prayer_support_channel")
+    .channel("prayer_likes_channel")
     .on(
       "postgres_changes",
       {
         event: "*", // Listen to all events (INSERT, UPDATE, DELETE)
         schema: "public",
-        table: "prayer_support",
+        table: "prayer_likes",
       },
       (payload) => {
-        console.log("Real-time prayer support update:", payload);
+        console.log("Real-time prayer likes update:", payload);
         callback(payload);
       }
     )

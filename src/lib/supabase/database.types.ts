@@ -9,38 +9,41 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      prayer_supports: {
+      prayer_likes: {
         Row: {
+          anonymous: boolean
           created_at: string | null
           id: string
-          ip_address: unknown | null
           prayer_id: string
+          supporter_name: string | null
           user_id: string | null
         }
         Insert: {
+          anonymous?: boolean
           created_at?: string | null
           id?: string
-          ip_address?: unknown | null
           prayer_id: string
+          supporter_name?: string | null
           user_id?: string | null
         }
         Update: {
+          anonymous?: boolean
           created_at?: string | null
           id?: string
-          ip_address?: unknown | null
           prayer_id?: string
+          supporter_name?: string | null
           user_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "prayer_supports_prayer_id_fkey"
+            foreignKeyName: "prayer_likes_prayer_id_fkey"
             columns: ["prayer_id"]
             isOneToOne: false
             referencedRelation: "prayers"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "prayer_supports_user_id_fkey"
+            foreignKeyName: "prayer_likes_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
@@ -60,7 +63,6 @@ export type Database = {
           on_behalf_of: string | null
           organization_type: string | null
           scripture: string | null
-          support_count: number | null
           type: string
           updated_at: string | null
           urgent: boolean | null
@@ -77,7 +79,6 @@ export type Database = {
           on_behalf_of?: string | null
           organization_type?: string | null
           scripture?: string | null
-          support_count?: number | null
           type: string
           updated_at?: string | null
           urgent?: boolean | null
@@ -94,7 +95,6 @@ export type Database = {
           on_behalf_of?: string | null
           organization_type?: string | null
           scripture?: string | null
-          support_count?: number | null
           type?: string
           updated_at?: string | null
           urgent?: boolean | null
@@ -175,7 +175,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_prayer_likes_count: {
+        Args: { prayer_id: string }
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never
@@ -186,9 +189,11 @@ export type Database = {
   }
 }
 
+type PublicSchema = Database[Extract<keyof Database, "public">]
+
 export type Tables<
   PublicTableNameOrOptions extends
-    | keyof (Database["public"]["Tables"] & Database["public"]["Views"])
+    | keyof (PublicSchema["Tables"] & PublicSchema["Views"])
     | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
@@ -201,10 +206,10 @@ export type Tables<
     }
     ? R
     : never
-  : PublicTableNameOrOptions extends keyof (Database["public"]["Tables"] &
-      Database["public"]["Views"])
-  ? (Database["public"]["Tables"] &
-      Database["public"]["Views"])[PublicTableNameOrOptions] extends {
+  : PublicTableNameOrOptions extends keyof (PublicSchema["Tables"] &
+      PublicSchema["Views"])
+  ? (PublicSchema["Tables"] &
+      PublicSchema["Views"])[PublicTableNameOrOptions] extends {
       Row: infer R
     }
     ? R
@@ -213,7 +218,7 @@ export type Tables<
 
 export type TablesInsert<
   PublicTableNameOrOptions extends
-    | keyof Database["public"]["Tables"]
+    | keyof PublicSchema["Tables"]
     | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
@@ -224,8 +229,8 @@ export type TablesInsert<
     }
     ? I
     : never
-  : PublicTableNameOrOptions extends keyof Database["public"]["Tables"]
-  ? Database["public"]["Tables"][PublicTableNameOrOptions] extends {
+  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
+  ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
       Insert: infer I
     }
     ? I
@@ -234,7 +239,7 @@ export type TablesInsert<
 
 export type TablesUpdate<
   PublicTableNameOrOptions extends
-    | keyof Database["public"]["Tables"]
+    | keyof PublicSchema["Tables"]
     | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
@@ -245,10 +250,23 @@ export type TablesUpdate<
     }
     ? U
     : never
-  : PublicTableNameOrOptions extends keyof Database["public"]["Tables"]
-  ? Database["public"]["Tables"][PublicTableNameOrOptions] extends {
+  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
+  ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
       Update: infer U
     }
     ? U
     : never
+  : never
+
+export type Enums<
+  PublicEnumNameOrOptions extends
+    | keyof PublicSchema["Enums"]
+    | { schema: keyof Database },
+  EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
+    ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
+    : never = never
+> = PublicEnumNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
+  ? PublicSchema["Enums"][PublicEnumNameOrOptions]
   : never
