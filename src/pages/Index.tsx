@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { PrayerCard } from "@/components/PrayerCard";
 import { PrayerSubmission } from "@/components/PrayerSubmission";
 // import AuthModal from "@/components/AuthModal"; // Hidden but kept for future use
@@ -6,178 +7,69 @@ import { PrayerSubmission } from "@/components/PrayerSubmission";
 import WaitlistModal from "@/components/WaitlistModal";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Heart, Users, User, Home, Gift } from "lucide-react";
-import Dashboard from "./Dashboard";
-import { getStoredPrayers, storePrayer, initializePrayerStorage, type StoredPrayer } from "@/utils/prayerStorage";
+import { Plus, Heart, Users, Gift, Loader2 } from "lucide-react";
+import { getStoredPrayers, storePrayer, type StoredPrayer } from "@/utils/prayerStorage";
+import { subscribeToPrayers } from "@/lib/supabase/prayers";
+import { toast } from "sonner";
 
-interface Prayer extends StoredPrayer {}
-
-// Default prayers for initialization
-const defaultPrayers: StoredPrayer[] = [
-  {
-    id: "1",
-    content: "Going through a difficult time with my health. Would appreciate prayers for strength and healing during my treatment journey.",
-    type: "prayer",
-    author: "Sarah M.",
-    supportCount: 24,
-    timeAgo: "2 hours ago",
-    category: "Health",
-    anonymous: false,
-    urgent: true,
-    onBehalfOf: "",
-    organizationType: "individual",
-    createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
-  },
-  {
-    id: "2",
-    content: "Grateful for the wonderful news about my sister's recovery. Sending blessings to everyone who supported us during this time.",
-    type: "blessing",
-    author: "Michael K.",
-    supportCount: 18,
-    timeAgo: "4 hours ago",
-    category: "Gratitude",
-    anonymous: false,
-    urgent: false,
-    onBehalfOf: "My sister",
-    organizationType: "individual",
-    createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString()
-  },
-  {
-    id: "3",
-    content: "Starting a new job next week and feeling nervous. Prayers for confidence and wisdom would mean the world to me.",
-    type: "prayer",
-    author: "David L.",
-    supportCount: 31,
-    timeAgo: "6 hours ago",
-    category: "Work",
-    anonymous: false,
-    urgent: false,
-    onBehalfOf: "",
-    organizationType: "individual",
-    createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString()
-  },
-  {
-    id: "4",
-    content: "Blessing everyone who's struggling today. Remember that you are loved, valued, and stronger than you know. Peace be with you all.",
-    type: "blessing",
-    author: "Hope Community Church",
-    supportCount: 42,
-    timeAgo: "8 hours ago",
-    category: "General",
-    anonymous: false,
-    urgent: false,
-    onBehalfOf: "Our community",
-    organizationType: "organization",
-    createdAt: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString()
-  },
-  {
-    id: "5",
-    content: "My family is going through a tough financial situation. Prayers for guidance and opportunities would be deeply appreciated.",
-    type: "prayer",
-    author: "Anonymous",
-    supportCount: 19,
-    timeAgo: "12 hours ago",
-    category: "Family",
-    anonymous: true,
-    urgent: false,
-    onBehalfOf: "My family",
-    organizationType: "individual",
-    createdAt: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString()
-  },
-  {
-    id: "6",
-    content: "Our food bank is organizing a community drive this weekend. Praying for generous hearts and abundant donations to help feed families in need during these challenging times.",
-    type: "prayer",
-    author: "Community Food Bank",
-    supportCount: 67,
-    timeAgo: "1 day ago",
-    category: "General",
-    anonymous: false,
-    urgent: false,
-    onBehalfOf: "Families in need",
-    organizationType: "organization",
-    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
-  },
-  {
-    id: "7",
-    content: "We are overwhelmed with gratitude! Thanks to our amazing community, we collected over 2,000 pounds of food and raised $15,000 for local families. Your generosity is a true blessing.",
-    type: "blessing",
-    author: "Helping Hands Nonprofit",
-    supportCount: 89,
-    timeAgo: "2 days ago",
-    category: "Gratitude",
-    anonymous: false,
-    urgent: false,
-    onBehalfOf: "Community donors",
-    organizationType: "organization",
-    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
-  },
-  {
-    id: "8",
-    content: "May all who are seeking healing find comfort and strength today. May your journey be filled with hope, love, and the support of those around you. Blessings to each precious soul.",
-    type: "blessing",
-    author: "St. Mary's Interfaith Center",
-    supportCount: 156,
-    timeAgo: "3 days ago",
-    category: "Health",
-    anonymous: false,
-    urgent: false,
-    onBehalfOf: "All seeking healing",
-    organizationType: "organization",
-    createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
-  },
-  {
-    id: "9",
-    content: "Our local community was affected by recent flooding. We're seeking prayers for recovery, rebuilding, and hope for everyone impacted.",
-    type: "prayer",
-    author: "Peace Unity Church",
-    supportCount: 156,
-    timeAgo: "5 hours ago",
-    category: "General",
-    anonymous: false,
-    urgent: false,
-    onBehalfOf: "Our community",
-    organizationType: "organization",
-    createdAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString()
-  },
-  {
-    id: "10",
-    content: "Join us in praying for peace, understanding, and harmony across all nations and communities worldwide.",
-    type: "prayer",
-    author: "Global Peace Initiative",
-    supportCount: 312,
-    timeAgo: "12 hours ago",
-    category: "General",
-    anonymous: false,
-    urgent: false,
-    onBehalfOf: "All nations",
-    organizationType: "organization",
-    createdAt: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString()
-  }
-];
+// Remove empty interface - using StoredPrayer directly
 
 const Index = () => {
-  const [prayers, setPrayers] = useState<StoredPrayer[]>([]);
+  const queryClient = useQueryClient();
   const [showSubmission, setShowSubmission] = useState(false);
   const [activeTab, setActiveTab] = useState("prayers");
   const [activeFilter, setActiveFilter] = useState("all");
   const [currentView, setCurrentView] = useState("home");
   // const [showAuthModal, setShowAuthModal] = useState(false); // Hidden but kept for future use
   const [showWaitlist, setShowWaitlist] = useState(false);
-  const [user, setUser] = useState<{ name: string; email: string } | null>(null);
   const [stats] = useState({
     totalPrayers: 1247,
     totalBlessings: 892,
     activeCommunity: 3421
   });
 
-  // Initialize prayers from storage on component mount
-  useEffect(() => {
-    initializePrayerStorage(defaultPrayers);
-    setPrayers(getStoredPrayers());
-  }, []);
+  // Fetch prayers using React Query with async function
+  const {
+    data: prayers = [],
+    isLoading,
+    isError
+  } = useQuery({
+    queryKey: ['prayers'],
+    queryFn: async () => {
+      console.log('React Query: Fetching prayers from Supabase...');
+      const result = await getStoredPrayers();
+      console.log('React Query: Fetched', result.length, 'prayers');
+      return result;
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
+    retry: 3, // Retry failed requests
+  });
 
-  const handleNewPrayer = (newPrayer: {
+  // Set up real-time subscription
+  useEffect(() => {
+    const unsubscribe = subscribeToPrayers((payload) => {
+      console.log('Real-time prayer update:', payload);
+
+      if (payload.eventType === 'INSERT') {
+        // Invalidate queries to refetch data
+        queryClient.invalidateQueries({ queryKey: ['prayers'] });
+        toast.success('New prayer added to the community!');
+      } else if (payload.eventType === 'UPDATE') {
+        // Update specific prayer in cache
+        queryClient.invalidateQueries({ queryKey: ['prayers'] });
+      } else if (payload.eventType === 'DELETE') {
+        // Remove prayer from cache
+        queryClient.invalidateQueries({ queryKey: ['prayers'] });
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [queryClient]);
+
+  const handleNewPrayer = async (newPrayer: {
     content: string;
     type: "prayer" | "blessing";
     category: string;
@@ -192,31 +84,44 @@ const Index = () => {
     image?: string;
   }) => {
     const prayer: StoredPrayer = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       ...newPrayer,
       supportCount: 0,
       timeAgo: "Just now",
       createdAt: new Date().toISOString()
     };
-    
+
     console.log('Creating new prayer:', prayer.id, prayer.type, prayer.content.substring(0, 50));
-    
-    // Store the prayer and update state
-    storePrayer(prayer);
-    setPrayers(prev => [prayer, ...prev]);
-    setShowSubmission(false);
 
-    console.log('Prayer stored and state updated');
-    console.log('New prayer has image:', !!prayer.image);
-    console.log('Image length:', prayer.image?.length || 0);
-    
-    // Show waitlist prompt after submission
-    setShowWaitlist(true);
+    try {
+      // Store the prayer using the async function
+      const savedPrayer = await storePrayer(prayer);
+      console.log('Prayer stored successfully:', savedPrayer.id);
 
-    // Handle forwarding if email or phone provided
-    if (newPrayer.forwardEmail || newPrayer.forwardPhone) {
-      // In real implementation, this would send the prayer via email/SMS
-      console.log(`Forwarding to: ${newPrayer.forwardEmail || newPrayer.forwardPhone}`);
+      // Invalidate queries to refetch fresh data
+      queryClient.invalidateQueries({ queryKey: ['prayers'] });
+
+      setShowSubmission(false);
+
+      console.log('Prayer stored and queries invalidated');
+      console.log('New prayer has image:', !!prayer.image);
+      console.log('Image length:', prayer.image?.length || 0);
+
+      // Show success toast
+      toast.success(prayer.type === 'prayer' ? 'Prayer shared with the community!' : 'Blessing request shared!');
+
+      // Show waitlist prompt after submission
+      setShowWaitlist(true);
+
+      // Handle forwarding if email or phone provided
+      if (newPrayer.forwardEmail || newPrayer.forwardPhone) {
+        // In real implementation, this would send the prayer via email/SMS
+        console.log(`Forwarding to: ${newPrayer.forwardEmail || newPrayer.forwardPhone}`);
+        toast.success('Prayer forwarded successfully!');
+      }
+    } catch (error) {
+      console.error('Error saving prayer:', error);
+      toast.error('Failed to save prayer. Please try again.');
     }
   };
 
@@ -420,12 +325,34 @@ const Index = () => {
             </div>
 
             <div className="space-y-6">
-              {filteredPrayers.map((prayer) => (
-                <PrayerCard
-                  key={prayer.id}
-                  {...prayer}
-                />
-              ))}
+              {isLoading ? (
+                <div className="flex flex-col items-center justify-center py-8 space-y-4">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  <p className="text-muted-foreground">Loading prayers...</p>
+                </div>
+              ) : isError ? (
+                <div className="flex flex-col items-center justify-center py-8 space-y-4">
+                  <p className="text-destructive">Failed to load prayers</p>
+                  <Button
+                    onClick={() => queryClient.invalidateQueries({ queryKey: ['prayers'] })}
+                    variant="outline"
+                    size="sm"
+                  >
+                    Try Again
+                  </Button>
+                </div>
+              ) : filteredPrayers.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground">No prayers found in this category.</p>
+                </div>
+              ) : (
+                filteredPrayers.map((prayer) => (
+                  <PrayerCard
+                    key={prayer.id}
+                    {...prayer}
+                  />
+                ))
+              )}
             </div>
           </TabsContent>
 
@@ -462,12 +389,34 @@ const Index = () => {
             </div>
 
             <div className="space-y-6">
-              {filteredPrayers.map((prayer) => (
-                <PrayerCard
-                  key={prayer.id}
-                  {...prayer}
-                />
-              ))}
+              {isLoading ? (
+                <div className="flex flex-col items-center justify-center py-8 space-y-4">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  <p className="text-muted-foreground">Loading blessings...</p>
+                </div>
+              ) : isError ? (
+                <div className="flex flex-col items-center justify-center py-8 space-y-4">
+                  <p className="text-destructive">Failed to load blessings</p>
+                  <Button
+                    onClick={() => queryClient.invalidateQueries({ queryKey: ['prayers'] })}
+                    variant="outline"
+                    size="sm"
+                  >
+                    Try Again
+                  </Button>
+                </div>
+              ) : filteredPrayers.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground">No blessings found in this category.</p>
+                </div>
+              ) : (
+                filteredPrayers.map((prayer) => (
+                  <PrayerCard
+                    key={prayer.id}
+                    {...prayer}
+                  />
+                ))
+              )}
             </div>
           </TabsContent>
         </Tabs>

@@ -1,4 +1,6 @@
-// Utility for managing prayer storage across the app
+// Utility for managing prayer storage via Supabase
+import { fetchPrayers, fetchPrayer, insertPrayer } from '@/lib/supabase/prayers';
+
 export interface StoredPrayer {
   id: string;
   content: string;
@@ -16,62 +18,41 @@ export interface StoredPrayer {
   createdAt: string;
 }
 
-const STORAGE_KEY = 'getblessed_prayers';
-
-// Get all prayers from storage
-export const getStoredPrayers = (): StoredPrayer[] => {
+// Get all prayers from Supabase
+export const getStoredPrayers = async (): Promise<StoredPrayer[]> => {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    const parsed = stored ? JSON.parse(stored) : [];
-    console.log('Retrieved prayers from storage:', parsed.length, 'prayers found');
-    return parsed;
+    const prayers = await fetchPrayers();
+    console.log('Retrieved prayers from Supabase:', prayers.length, 'prayers found');
+    return prayers;
   } catch (error) {
-    console.error('Error reading prayers from storage:', error);
-    return [];
+    console.error('Error reading prayers from Supabase:', error);
+    throw error; // Propagate error instead of falling back
   }
 };
 
-// Get a single prayer by ID
-export const getStoredPrayer = (id: string): StoredPrayer | null => {
+// Get a single prayer by ID from Supabase
+export const getStoredPrayer = async (id: string): Promise<StoredPrayer | null> => {
   try {
-    const prayers = getStoredPrayers();
-    console.log('Looking for prayer ID:', id);
-    console.log('Available prayer IDs:', prayers.map(p => p.id));
-    const found = prayers.find(prayer => prayer.id === id) || null;
-    console.log('Found prayer:', found ? 'Yes' : 'No');
-    return found;
+    const prayer = await fetchPrayer(id);
+    console.log('Found prayer in Supabase:', prayer ? 'Yes' : 'No');
+    return prayer;
   } catch (error) {
-    console.error('Error finding prayer:', error);
-    return null;
+    console.error('Error finding prayer in Supabase:', error);
+    throw error; // Propagate error instead of falling back
   }
 };
 
-// Store a prayer
-export const storePrayer = (prayer: StoredPrayer): void => {
+// Store a prayer in Supabase
+export const storePrayer = async (prayer: StoredPrayer): Promise<StoredPrayer> => {
   try {
-    const prayers = getStoredPrayers();
-    const updatedPrayers = [prayer, ...prayers];
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedPrayers));
-    console.log('Stored prayer:', prayer.id, prayer.type, prayer.content.substring(0, 50));
-    console.log('Total prayers in storage:', updatedPrayers.length);
+    const savedPrayer = await insertPrayer({
+      ...prayer,
+      id: prayer.id || crypto.randomUUID(),
+    });
+    console.log('Stored prayer in Supabase:', savedPrayer.id, savedPrayer.type, savedPrayer.content.substring(0, 50));
+    return savedPrayer;
   } catch (error) {
-    console.error('Error storing prayer:', error);
-  }
-};
-
-// Update all prayers (for bulk operations)
-export const storeAllPrayers = (prayers: StoredPrayer[]): void => {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(prayers));
-  } catch (error) {
-    console.error('Error storing prayers:', error);
-  }
-};
-
-// Initialize storage with default prayers if empty
-export const initializePrayerStorage = (defaultPrayers: StoredPrayer[]): void => {
-  const existing = getStoredPrayers();
-  if (existing.length === 0) {
-    storeAllPrayers(defaultPrayers);
+    console.error('Error storing prayer in Supabase:', error);
+    throw error; // Propagate error instead of falling back
   }
 };

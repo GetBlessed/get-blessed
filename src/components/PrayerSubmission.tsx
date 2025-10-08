@@ -22,7 +22,7 @@ interface PrayerSubmissionProps {
     forwardEmail?: string;
     forwardPhone?: string;
     image?: string;
-  }) => void;
+  }) => Promise<void>;
 }
 
 export const PrayerSubmission = ({ onSubmit }: PrayerSubmissionProps) => {
@@ -74,7 +74,7 @@ export const PrayerSubmission = ({ onSubmit }: PrayerSubmissionProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!content.trim() || !author.trim()) {
       toast({
         title: "Please fill in all fields",
@@ -94,56 +94,53 @@ export const PrayerSubmission = ({ onSubmit }: PrayerSubmissionProps) => {
     }
 
     setIsSubmitting(true);
-    
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate submission
-      
-        onSubmit({
-          content: content.trim(),
-          type,
-          category: category || "General",
-          author: author.trim(),
-          anonymous,
-          urgent,
-          onBehalfOf: onBehalfOf.trim(),
-          organizationType,
-          scripture: includeScripture ? suggestedScripture : "",
-          forwardEmail: forwardEmail.trim(),
-          forwardPhone: forwardPhone.trim(),
-          image: uploadedImage || "",
-        });
 
-        // Reset form
-        setContent("");
-        setAuthor("");
-        setCategory("");
-        setType("prayer");
-        setAnonymous(false);
-        setUrgent(false);
-        setOnBehalfOf("");
-        setOrganizationType("individual");
-        setSuggestedScripture("");
-        setShowScripture(false);
-        setIncludeScripture(false);
-        setForwardEmail("");
-        setForwardPhone("");
-        setShowForward(false);
-        setUploadedImage(null);
-        
-        toast({
-          title: type === "prayer" ? "Prayer submitted! 🙏" : "Blessing request shared! ✨",
-          description: "Your heartfelt message has been shared with the community.",
-        });
-      } catch (error) {
-        toast({
-          title: "Something went wrong",
-          description: "Please try again in a moment.",
-          variant: "destructive",
-        });
-      } finally {
-        setIsSubmitting(false);
-      }
-    };
+    try {
+      // Call the onSubmit function which now handles Supabase saving
+      await onSubmit({
+        content: content.trim(),
+        type,
+        category: category || "General",
+        author: author.trim(),
+        anonymous,
+        urgent,
+        onBehalfOf: onBehalfOf.trim(),
+        organizationType,
+        scripture: includeScripture ? suggestedScripture : "",
+        forwardEmail: forwardEmail.trim(),
+        forwardPhone: forwardPhone.trim(),
+        image: uploadedImage || "",
+      });
+
+      // Reset form only after successful submission
+      setContent("");
+      setAuthor("");
+      setCategory("");
+      setType("prayer");
+      setAnonymous(false);
+      setUrgent(false);
+      setOnBehalfOf("");
+      setOrganizationType("individual");
+      setSuggestedScripture("");
+      setShowScripture(false);
+      setIncludeScripture(false);
+      setForwardEmail("");
+      setForwardPhone("");
+      setShowForward(false);
+      setUploadedImage(null);
+
+      // Note: Success toast is now handled in Index.tsx
+    } catch (error) {
+      console.error('Error submitting prayer:', error);
+      toast({
+        title: "Something went wrong",
+        description: error instanceof Error ? error.message : "Please try again in a moment.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
