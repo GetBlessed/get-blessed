@@ -2,25 +2,27 @@ import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { PrayerCard } from "@/components/PrayerCard";
 import { PrayerSubmission } from "@/components/PrayerSubmission";
-// import AuthModal from "@/components/AuthModal"; // Hidden but kept for future use
-// import PostSubmissionAuthModal from "@/components/PostSubmissionAuthModal"; // Hidden but kept for future use
+import { AuthModal } from "@/components/AuthModal";
 import WaitlistModal from "@/components/WaitlistModal";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Heart, Users, Gift, Loader2 } from "lucide-react";
+import { Plus, Heart, Users, Gift, Loader2, LogIn, User } from "lucide-react";
 import { getStoredPrayers, storePrayer, type StoredPrayer } from "@/utils/prayerStorage";
 import { subscribeToPrayers } from "@/lib/supabase/prayers";
+import { useAuth } from "@/lib/auth/AuthProvider";
 import { toast } from "sonner";
 
 // Remove empty interface - using StoredPrayer directly
 
 const Index = () => {
   const queryClient = useQueryClient();
+  const { user, signOut, loading: authLoading } = useAuth();
+  
   const [showSubmission, setShowSubmission] = useState(false);
   const [activeTab, setActiveTab] = useState("prayers");
   const [activeFilter, setActiveFilter] = useState("all");
   const [currentView, setCurrentView] = useState("home");
-  // const [showAuthModal, setShowAuthModal] = useState(false); // Hidden but kept for future use
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [showWaitlist, setShowWaitlist] = useState(false);
   const [stats] = useState({
     totalPrayers: 1247,
@@ -83,9 +85,15 @@ const Index = () => {
     forwardPhone?: string;
     image?: string;
   }) => {
+    // Use authenticated user info if available
+    const authorName = user && !newPrayer.anonymous 
+      ? (user.alias || user.first_name || user.email)
+      : newPrayer.author;
+
     const prayer: StoredPrayer = {
       id: crypto.randomUUID(),
       ...newPrayer,
+      author: authorName,
       supportCount: 0,
       timeAgo: "Just now",
       createdAt: new Date().toISOString()
@@ -213,18 +221,39 @@ const Index = () => {
             <h1 className="text-xl font-bold text-primary">GetBlessed</h1>
             <span className="text-xs text-muted-foreground">• Connecting hearts through prayer</span>
           </div>
-          {/* Hidden for now - auth will be added later */}
-          {/* {user ? (
-            <Button variant="outline" size="sm" className="flex items-center gap-2" onClick={handleLogout}>
-              <User className="h-4 w-4" />
-              {user.name} • Sign Out
-            </Button>
+          
+          {/* Authentication Controls */}
+          {authLoading ? (
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span className="text-sm text-muted-foreground">Loading...</span>
+            </div>
+          ) : user ? (
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">
+                Welcome, {user.alias || user.first_name || 'Friend'}!
+              </span>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex items-center gap-2" 
+                onClick={signOut}
+              >
+                <User className="h-4 w-4" />
+                Sign Out
+              </Button>
+            </div>
           ) : (
-            <Button variant="outline" size="sm" className="flex items-center gap-2" onClick={() => setShowWaitlist(true)}>
-              <User className="h-4 w-4" />
-              Join Waitlist
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="flex items-center gap-2" 
+              onClick={() => setShowAuthModal(true)}
+            >
+              <LogIn className="h-4 w-4" />
+              Sign In
             </Button>
-          )} */}
+          )}
         </div>
       </nav>
 
@@ -264,13 +293,24 @@ const Index = () => {
         {/* Share Button */}
         <div className="text-center mb-6 sm:mb-8">
           <Button
-            onClick={() => setShowSubmission(!showSubmission)}
+            onClick={() => {
+              if (!user) {
+                setShowAuthModal(true);
+                return;
+              }
+              setShowSubmission(!showSubmission);
+            }}
             size="lg"
             className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-6 sm:px-8 py-2.5 sm:py-3 shadow-medium transition-all hover:shadow-elevated w-full sm:w-auto"
           >
             <Plus className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
             {showSubmission ? "Close" : "Share Your Heart"}
           </Button>
+          {!user && (
+            <p className="text-xs text-muted-foreground mt-2">
+              Sign in to share prayers and blessings
+            </p>
+          )}
         </div>
 
         {/* Prayer Submission Form */}
@@ -469,12 +509,11 @@ const Index = () => {
         onClose={() => setShowWaitlist(false)}
       />
 
-      {/* Auth Modal - Hidden but kept for future use */}
-      {/* <AuthModal 
+      {/* Auth Modal */}
+      <AuthModal 
         isOpen={showAuthModal} 
         onClose={() => setShowAuthModal(false)}
-        onLogin={handleLogin}
-      /> */}
+      />
     </div>
   );
 };
