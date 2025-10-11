@@ -1,0 +1,43 @@
+[33me9e9076[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Merge branch 'main' of https://github.com/fcosorio123/get-blessed
+[33m7b32304[m Merge Supabase integration up to last working state
+[33m0841600[m chore: amend last commit to remove comment
+[33mb9bddc2[m feat: refactor db
+[33ma5260c9[m Merge pull request #1 from fcosorio123/add-supabase
+[33m7408690[m feat: comment out unused toast
+[33m5a5c896[m feat: a bit of refactoring out the default prayers
+[33ma1976e4[m feat: waitlist works
+[33ma1cedec[m feat: prayers submit to db
+[33m1e4daa9[m feat: add supabase
+[33m92b2aa5[m feat: new favicon
+[33ma9f390b[m Replace login with waitlist modal
+[33m750f386[m Reverted to commit be8ab1984eadc00ffe72e377313f843c81671422
+[33m8b2f6f3[m Fix sharing and add delete functionality
+[33mea909b6[m Fix image and emoji sharing
+[33m7181552[m Fix sharing with images and emojis
+[33mbe8ab19[m Fix modal close button
+[33m1d39347[m Update tabs and waitlist modal
+[33m5cdb0d3[m Fix tab sizing and waitlist modal
+[33m2898cb6[m Fix tab consistency and update post-submission prompt
+[33m30d0fc4[m Reverted to commit 2e35a1cd3486d859c77dc8e1cc617ce39195f333
+[33m167fc22[m Fix images not displaying
+[33m3cd3123[m Fix page not found error
+[33m788ed94[m Fix image display on shareable links
+[33m2e35a1c[m Fix image display on shared page
+[33mce767d9[m Fix image display on shared page
+[33me4d018f[m Fix sharing with images
+[33m69a3f41[m Fix shareable link copying
+[33mcbb929d[m Fix clipboard copy error
+[33md2de1cb[m Fix sharing for new prayers
+[33m61678a5[m Fix shared prayer links
+[33m641581f[m Fix sharing for new prayers
+[33mc527901[m Fix header responsiveness and copy
+[33m7faa7b3[m Fix dashboard responsiveness and tab copy
+[33m5a0df75[m Fix dashboard responsiveness
+[33m17686e9[m Fix Blessings tab responsiveness
+[33m23fe972[m Remove test prayer links
+[33mea33b69[m Fix mobile optimization issues
+[33m63a3685[m Fix shared links and mobile optimization
+[33maa7a70c[m Fix shared prayer links and mobile optimization
+[33mdf1a2ba[m Fix prayer not found and optimize mobile view
+[33m572555b[m Add shareable link functionality
+[33meb06112[m Add shareable links for prayers
